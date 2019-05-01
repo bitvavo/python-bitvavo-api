@@ -1,4 +1,4 @@
-from pythonBitvavoApi.bitvavo import Bitvavo
+from bitvavo import Bitvavo
 import sys
 import signal
 import time
@@ -24,8 +24,11 @@ def main():
   testWebsockets(bitvavo)
 
 def testREST(bitvavo):
+  limit = bitvavo.getRemainingLimit()
+  print('Remaining ratelimit is', limit)
+
   response = bitvavo.time()
-  # print('Current time:', response['time'])
+  print(response)
 
   # response = bitvavo.markets({})
   # for market in response:
@@ -150,9 +153,11 @@ def testWebsockets(bitvavo):
   # websocket.subscriptionBookUpdate('BTC-EUR', callback)
 
   # websocket.subscriptionBook('BTC-EUR', callback)
+  limit = bitvavo.getRemainingLimit()
   try:
-    while(True):
-      time.sleep(2)
+    while(limit > 0):
+      time.sleep(0.5)
+      limit = bitvavo.getRemainingLimit()
   except KeyboardInterrupt:
     websocket.closeSocket()
 

@@ -89,6 +89,25 @@ def processLocalBook(ws, message):
 
   ws.callbacks['subscriptionBookUser'][market](ws.localBook[market])
 
+class rateLimitThread (threading.Thread):
+  def __init__(self, reset, bitvavo):
+    self.timeToWait = reset
+    self.bitvavo = bitvavo
+    threading.Thread.__init__(self)
+
+  def waitForReset(self, waitTime):
+    time.sleep(waitTime)
+    if (time.time() < self.bitvavo.rateLimitReset):
+      self.bitvavo.rateLimitRemaining = 1000
+      debugToConsole('Ban should have been lifted, resetting rate limit to 1000.')
+    else:
+      timeToWait = (self.bitvavo.rateLimitReset / 1000) - time.time()
+      debugToConsole('Ban took longer than expected, sleeping again for', timeToWait, 'seconds.')
+      self.waitForReset(timeToWait)
+
+  def run(self):
+    self.waitForReset(self.timeToWait)
+
 
 class receiveThread (threading.Thread):
   def __init__(self, ws, wsObject):
@@ -103,8 +122,8 @@ class receiveThread (threading.Thread):
         self.wsObject.reconnect = True
         self.wsObject.authenticated = False
         time.sleep(self.wsObject.reconnectTimer)
-        self.wsObject.reconnectTimer = self.wsObject.reconnectTimer * 2
         debugToConsole("we have just set reconnect to true and have waited for " + str(self.wsObject.reconnectTimer))
+        self.wsObject.reconnectTimer = self.wsObject.reconnectTimer * 2
     except KeyboardInterrupt:
       debugToConsole("We caught keyboard interrupt in the websocket thread.")
 
@@ -114,6 +133,8 @@ class Bitvavo:
     self.ACCESSWINDOW = None
     self.APIKEY = ''
     self.APISECRET = ''
+    self.rateLimitRemaining = 1000
+    self.rateLimitReset = 0
     global debugging
     debugging = False
     for key in options:
@@ -129,9 +150,38 @@ class Bitvavo:
       self.ACCESSWINDOW = 10000
     self.base = 'https://api.bitvavo.com/v2'
 
+  def getRemainingLimit(self):
+    return self.rateLimitRemaining
+
+  def updateRateLimit(self, response):
+    if 'errorCode' in response:
+      if (response['errorCode'] == 105):
+        self.rateLimitRemaining = 0
+        self.rateLimitReset = int(response['error'].split(' at ')[1].split('.')[0])
+        timeToWait = (self.rateLimitReset / 1000) - time.time()
+        if(not hasattr(self, 'rateLimitThread')):
+          self.rateLimitThread = rateLimitThread(timeToWait, self)
+          self.rateLimitThread.daemon = True
+          self.rateLimitThread.start()
+      # setTimeout(checkLimit, timeToWait)
+    if ('bitvavo-ratelimit-remaining' in response):
+      self.rateLimitRemaining = int(response['bitvavo-ratelimit-remaining'])
+    if ('bitvavo-ratelimit-resetat' in response):
+      self.rateLimitReset = int(response['bitvavo-ratelimit-resetat'])
+      timeToWait = (self.rateLimitReset / 1000) - time.time()
+      if(not hasattr(self, 'rateLimitThread')):
+          self.rateLimitThread = rateLimitThread(timeToWait, self)
+          self.rateLimitThread.daemon = True
+          self.rateLimitThread.start()
+
+
   def publicRequest(self, url):
     debugToConsole("REQUEST: " + url)
     r = requests.get(url)
+    if('error' in r.json()):
+      self.updateRateLimit(r.json())
+    else:
+      self.updateRateLimit(r.headers)
     return r.json()
 
   def privateRequest(self, endpoint, postfix, body = {}, method = 'GET'):
@@ -147,20 +197,17 @@ class Bitvavo:
     debugToConsole("REQUEST: " + url)
     if(method == 'GET'):
       r = requests.get(url, headers = headers)
-      print(r)
-      return r.json()
     elif(method == 'DELETE'):
       r = requests.delete(url, headers = headers)
-      print(r)
-      return r.json()
     elif(method == 'POST'):
       r = requests.post(url, headers = headers, json = body)
-      print(r)
-      return r.json()
     elif(method == 'PUT'):
       r = requests.put(url, headers = headers, json = body)
-      print(r)
-      return r.json()
+    if('error' in r.json()):
+      self.updateRateLimit(r.json())
+    else:
+      self.updateRateLimit(r.headers)
+    return r.json()
 
   def time(self):
     return self.publicRequest((self.base + '/time'))
@@ -278,10 +325,10 @@ class Bitvavo:
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 
   def newWebsocket(self):
-    return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW)
+    return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW, self)
 
   class websocket:
-    def __init__(self, APIKEY, APISECRET, ACCESSWINDOW):
+    def __init__(self, APIKEY, APISECRET, ACCESSWINDOW, bitvavo):
       self.APIKEY = APIKEY
       self.APISECRET = APISECRET
       self.ACCESSWINDOW = ACCESSWINDOW
@@ -290,6 +337,7 @@ class Bitvavo:
       self.keepAlive = True
       self.reconnect = False
       self.reconnectTimer = 0.1
+      self.bitvavo = bitvavo
 
       self.subscribe()
 
@@ -336,6 +384,8 @@ class Bitvavo:
       callbacks = ws.callbacks
 
       if('error' in msg):
+        if (msg['errorCode'] == 105):
+          ws.bitvavo.updateRateLimit(msg)
         if('error' in callbacks):
           callbacks['error'](msg)
         else:
@@ -455,7 +505,7 @@ class Bitvavo:
     def on_open(self):
       now = int(time.time()*1000)
       self.open = True
-      self.reconnectTimer = 0.1
+      self.reconnectTimer = 0.5
       if(self.APIKEY != ''):
         self.doSend(self.ws, json.dumps({ 'window':str(self.ACCESSWINDOW), 'action': 'authenticate', 'key': self.APIKEY, 'signature': createSignature(now, 'GET', '/websocket', {}, self.APISECRET), 'timestamp': now }))
       if self.reconnect:

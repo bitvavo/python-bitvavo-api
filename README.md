@@ -45,6 +45,15 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
 pip install python-bitvavo-api
 ```
 
+## Rate Limiting
+
+Bitvavo uses a weight based rate limiting system, with an allowed limit of 1000 per IP or API key each minute. Please inspect each endpoint in the [documentation](https://docs.bitvavo.com/) to see the weight. Failure to respect the rate limit will result in an IP or API key ban.
+Since the remaining limit is returned in the header on each REST request, the remaining limit is tracked locally and can be requested through:
+```
+limit = bitvavo.getRemainingLimit()
+```
+The websocket functions however do not return a remaining limit, therefore the limit is only updated locally once a ban has been issued.
+
 ## REST requests
 
 The general convention used in all functions (both REST and websockets), is that all optional parameters are passed as an dictionary, while required parameters are passed as separate values. Only when [placing orders](https://github.com/bitvavo/python-bitvavo-api#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. The returned responses are all converted to a dictionary as well, such that `response['<key>'] = '<value>'`.
@@ -1060,7 +1069,7 @@ All requests which can be done through REST requests can also be performed over 
 
 ### Getting started
 
-The websocket object should be intialised through the `newWebsocket()` function. After which a callback for the errors should be set. After this any desired function can be called. Finally the main thread should be kept alive for as long as you want the socket to stay open. This can be achieved through a simple `while(True)` loop.
+The websocket object should be intialised through the `newWebsocket()` function. After which a callback for the errors should be set. After this any desired function can be called. Finally the main thread should be kept alive for as long as you want the socket to stay open. This can be achieved through a simple `while()` loop, where the remaining limit is checked. This is in case a ban has been issued, otherwise the websocket object will keep trying to reconnect, while our servers keep closing the connection.
 
 ```python
 def errorCallback(error):
@@ -1075,9 +1084,11 @@ websocket.setErrorCallback(errorCallback)
 # Call functions here, like:
 # websocket.time(ownCallback)
 
+limit = bitvavo.getRemainingLimit()
 try:
-  while(True):
-    time.sleep(2)
+  while(limit > 0):
+    time.sleep(0.5)
+    limit = bitvavo.getRemainingLimit()
 except KeyboardInterrupt:
   websocket.closeSocket()
 ```

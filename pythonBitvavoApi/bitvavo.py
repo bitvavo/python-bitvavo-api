@@ -177,7 +177,19 @@ class Bitvavo:
 
   def publicRequest(self, url):
     debugToConsole("REQUEST: " + url)
-    r = requests.get(url)
+    if(self.APIKEY != ''):
+      now = int(time.time() * 1000)
+      # let sig = createSignature(timestamp, method, , data)
+      sig = createSignature(now, 'GET', url.replace(self.base, ''), {}, self.APISECRET)
+      headers = {
+        'Bitvavo-Access-Key': self.APIKEY,
+        'Bitvavo-Access-Signature': sig,
+        'Bitvavo-Access-Timestamp': str(now),
+        'Bitvavo-Access-Window': str(self.ACCESSWINDOW)
+      }
+      r = requests.get(url, headers = headers)
+    else:
+      r = requests.get(url)
     if('error' in r.json()):
       self.updateRateLimit(r.json())
     else:

@@ -179,7 +179,6 @@ class Bitvavo:
     debugToConsole("REQUEST: " + url)
     if(self.APIKEY != ''):
       now = int(time.time() * 1000)
-      # let sig = createSignature(timestamp, method, , data)
       sig = createSignature(now, 'GET', url.replace(self.base, ''), {}, self.APISECRET)
       headers = {
         'Bitvavo-Access-Key': self.APIKEY,

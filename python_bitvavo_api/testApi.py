@@ -1,4 +1,4 @@
-from pythonBitvavoApi.bitvavo import Bitvavo
+from python_bitvavo_api.bitvavo import Bitvavo
 import sys
 import signal
 import time

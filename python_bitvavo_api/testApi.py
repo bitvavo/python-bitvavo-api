@@ -147,6 +147,7 @@ def testWebsockets(bitvavo):
   # websocket.withdrawalHistory({}, callback)
 
   # websocket.subscriptionTicker('BTC-EUR', callback)
+  # websocket.subscriptionTicker24h('BTC-EUR', callback)
   # websocket.subscriptionAccount('BTC-EUR', callback)
   # websocket.subscriptionCandles('BTC-EUR', '1h', callback)
   # websocket.subscriptionTrades('BTC-EUR', callback)

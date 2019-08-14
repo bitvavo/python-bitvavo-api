@@ -238,7 +238,7 @@ class Bitvavo:
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/book' + postfix))
 
-  # options: limit, start, end, tradeId
+  # options: limit, start, end, tradeIdFrom, tradeIdTo
   def publicTrades(self, symbol, options):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/trades' + postfix))
@@ -262,7 +262,6 @@ class Bitvavo:
   # options: market
   def ticker24h(self, options):
     postfix = createPostfix(options)
-    return self.publicRequest(self.base + '/kill')
     return self.publicRequest((self.base + '/ticker/24h' + postfix))
 
   # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection), both: timeInForce, selfTradePrevention, responseRequired
@@ -287,7 +286,7 @@ class Bitvavo:
     postfix = createPostfix({ 'market': market, 'orderId': orderId})
     return self.privateRequest('/order', postfix, {}, 'DELETE')
 
-  # options: orderId, limit, start, end
+  # options: limit, start, end, orderIdFrom, orderIdTo
   def getOrders(self, market, options):
     options['market'] = market
     postfix = createPostfix(options)
@@ -303,7 +302,7 @@ class Bitvavo:
     postfix = createPostfix(options)
     return self.privateRequest('/ordersOpen', postfix, {}, 'GET')
 
-  # options: limit, start, end, tradeId
+  # options: limit, start, end, tradeIdFrom, tradeIdTo
   def trades(self, market, options):
     options['market'] = market
     postfix = createPostfix(options)
@@ -465,6 +464,9 @@ class Bitvavo:
         elif(msg['event'] == 'ticker'):
           market = msg['market']
           callbacks['subscriptionTicker'][market](msg)
+        elif(msg['event'] == 'ticker24h'):
+          for entry in msg['data']:
+            callbacks['subscriptionTicker24h'][entry['market']](entry)
         elif(msg['event'] == 'candle'):
           market = msg['market']
           interval = msg['interval']
@@ -496,6 +498,9 @@ class Bitvavo:
       if('subscriptionTicker' in self.callbacks):
         for market in self.callbacks['subscriptionTicker']:
           self.subscriptionTicker(market, self.callbacks['subscriptionTicker'][market])
+      if('subscriptionTicker24h' in self.callbacks):
+        for market in self.callbacks['subscriptionTicker24h']:
+          self.subscriptionTicker(market, self.callbacks['subscriptionTicker24h'][market])
       if('subscriptionAccount' in self.callbacks):
         for market in self.callbacks['subscriptionAccount']:
           self.subscriptionAccount(market, self.callbacks['subscriptionAccount'][market])
@@ -550,7 +555,7 @@ class Bitvavo:
       options['action'] = 'getBook'
       self.doSend(self.ws, json.dumps(options))
 
-    # options: limit, start, end
+    # options: limit, start, end, tradeIdFrom, tradeIdTo
     def publicTrades(self, market, options, callback):
       self.callbacks['publicTrades'] = callback
       options['market'] = market
@@ -611,7 +616,7 @@ class Bitvavo:
       options = { 'action': 'privateCancelOrder', 'market': market, 'orderId': orderId }
       self.doSend(self.ws, json.dumps(options), True)
 
-    # options: orderId, limit, start, end
+    # options: limit, start, end, orderIdFrom, orderIdTo
     def getOrders(self, market, options, callback):
       self.callbacks['getOrders'] = callback
       options['action'] = 'privateGetOrders'
@@ -630,7 +635,7 @@ class Bitvavo:
       options['action'] = 'privateGetOrdersOpen'
       self.doSend(self.ws, json.dumps(options), True)
 
-    # options: limit, start, end, tradeId
+    # options: limit, start, end, tradeIdFrom, tradeIdTo
     def trades(self, market, options, callback):
       self.callbacks['trades'] = callback
       options['action'] = 'privateGetTrades'
@@ -673,6 +678,12 @@ class Bitvavo:
         self.callbacks['subscriptionTicker'] = {}
       self.callbacks['subscriptionTicker'][market] = callback
       self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker', 'markets': [market] }] }))
+
+    def subscriptionTicker24h(self, market, callback):
+      if 'subscriptionTicker24h' not in self.callbacks:
+        self.callbacks['subscriptionTicker24h'] = {}
+      self.callbacks['subscriptionTicker24h'][market] = callback
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker24h', 'markets': [market] }] }))
 
     def subscriptionAccount(self, market, callback):
       if 'subscriptionAccount' not in self.callbacks:

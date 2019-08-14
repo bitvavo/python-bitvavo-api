@@ -1,9 +1,9 @@
 <p align="center">
-  <a href="https://www.bitvavo.com"><img src="https://bitvavo.com/media/images/logo/bitvavoGeneral.svg" width="600" title="Bitvavo Logo"></a>
+  <a href="https://bitvavo.com"><img src="https://bitvavo.com/media/images/logo/bitvavoGeneral.svg" width="600" title="Bitvavo Logo"></a>
 </p>
 
 # Python Bitvavo Api
-This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [documentation](https://docs.bitvavo.com/)
+This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)
 
 * Getting started       [REST](https://github.com/bitvavo/python-bitvavo-api#getting-started) [Websocket](https://github.com/bitvavo/python-bitvavo-api#getting-started-1)
 * General
@@ -33,6 +33,7 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
   * Withdrawal History  [REST](https://github.com/bitvavo/python-bitvavo-api#get-withdrawal-history) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-withdrawal-history-1)
 * [Subscriptions](https://github.com/bitvavo/python-bitvavo-api#subscriptions)
   * [Ticker Subscription](https://github.com/bitvavo/python-bitvavo-api#ticker-subscription)
+  * [Ticker 24 Hour Subscription](https://github.com/bitvavo/python-bitvavo-api#ticker-24-hour-subscription)
   * [Account Subscription](https://github.com/bitvavo/python-bitvavo-api#account-subscription)
   * [Candles Subscription](https://github.com/bitvavo/python-bitvavo-api#candles-subscription)
   * [Trades Subscription](https://github.com/bitvavo/python-bitvavo-api#trades-subscription)
@@ -293,7 +294,7 @@ print(response)
 
 #### Get trades per market
 ```python
-# options: limit, start, end, tradeId
+# options: limit, start, end, tradeIdFrom, tradeIdTo
 response = bitvavo.publicTrades('BTC-EUR', {})
 print(response)
 ```
@@ -303,40 +304,32 @@ print(response)
 ```python
 [ 
   {
-    "id": "79e4bf2f-4fac-4895-9bb2-a5c9c6e2ff3f",
-    "timestamp": 1548666712071,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": False,
-    "fee": "0.8",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "041689b3-cbb6-49ec-9964-2fb2d353dd1b",
+    "timestamp": 1565672192018,
+    "amount": "0.12735922",
+    "price": "10147",
+    "side": "sell"
   },
   {
-    "id": "102486d3-5b72-4fa2-89cf-84c934edb7ae",
-    "timestamp": 1548666561486,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": True,
-    "fee": "1",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "fb1712f2-e183-457c-b9e5-ff0d31fccd1f",
+    "timestamp": 1565672192014,
+    "amount": "0.08703703",
+    "price": "10149",
+    "side": "sell"
   },
   {
-    "id": "965facc7-b3c3-43d0-8a1d-30a2f782ee17",
-    "timestamp": 1548666373407,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": False,
-    "fee": "0.8",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "b8cf5e20-65ca-4f45-a94c-44b7cb3952a5",
+    "timestamp": 1565672192009,
+    "amount": "0.0979994",
+    "price": "10151",
+    "side": "sell"
+  },
+  {
+    "id": "d10cc7ec-a735-4d5c-8169-c3099f8b5003",
+    "timestamp": 1565672144747,
+    "amount": "0.01975188",
+    "price": "10151",
+    "side": "sell"
   }
   ...
 ]
@@ -459,34 +452,32 @@ print(response)
 ```python
 [
   {
-    "market": "BTC-EUR",
-    "bid": "3008.8",
-    "ask": "3008.9"
-  },
-  {
-    "market": "WAVES-EUR",
-    "bid": "2.3379",
-    "ask": "2.3462"
-  },
-  {
-    "market": "ICX-EUR",
-    "bid": "0.17982",
-    "ask": "0.18066"
-  },
-  {
-    "market": "ELF-EUR",
-    "bid": "0.086931",
-    "ask": "0.087604"
+    "market": "ZIL-BTC",
+    "bid": "0.00000082",
+    "ask": "0.00000083",
+    "bidSize": "13822.00651664",
+    "askSize": "5743.88893286"
   },
   {
     "market": "ZIL-EUR",
-    "bid": "0.01858",
-    "ask": "0.018639"
+    "bid": "0.0082973",
+    "ask": "0.0084058",
+    "bidSize": "19586.15862762",
+    "askSize": "19048.86640562"
   },
   {
-    "market": "NAS-EUR",
-    "bid": "0.45109",
-    "ask": "0.45333"
+    "market": "ZRX-BTC",
+    "bid": "0.00001625",
+    "ask": "0.00001629",
+    "bidSize": "823.87743487",
+    "askSize": "868.23901671"
+  },
+  {
+    "market": "ZRX-EUR",
+    "bid": "0.16443",
+    "ask": "0.16498",
+    "bidSize": "898.35016343",
+    "askSize": "419.16696625"
   },
   ...
 ]
@@ -505,40 +496,46 @@ print(response)
 ```python
 [
   {
-    "market": "AE-BTC",
-    "open": "0.00010658",
-    "high": "0.00010658",
-    "low": "0.00010658",
-    "last": "0.00010658",
-    "volume": "2",
-    "volumeQuote": "0.00021316"
+    "market": "XVG-EUR",
+    "open": "0.0045692",
+    "high": "0.0045853",
+    "low": "0.0043599",
+    "last": "0.0044047",
+    "volume": "594786.9689017",
+    "volumeQuote": "2648.07",
+    "bid": "0.0043493",
+    "bidSize": "1561220.43836043",
+    "ask": "0.004453",
+    "askSize": "1457312.74672114",
+    "timestamp": 1565684835077
   },
   {
-    "market": "AION-BTC",
-    "open": "0.000034026",
-    "high": "0.000034026",
-    "low": "0.000034026",
-    "last": "0.000034026",
-    "volume": "2",
-    "volumeQuote": "0.00006805"
+    "market": "ZIL-EUR",
+    "open": "0.0081178",
+    "high": "0.0084196",
+    "low": "0.0077389",
+    "last": "0.0084071",
+    "volume": "950455.78568402",
+    "volumeQuote": "7687.71",
+    "bid": "0.008294",
+    "bidSize": "19593.90088084",
+    "ask": "0.0084",
+    "askSize": "19048.86640562",
+    "timestamp": 1565684834952
   },
   {
-    "market": "ANT-BTC",
-    "open": "0.00010822",
-    "high": "0.00010822",
-    "low": "0.00010822",
-    "last": "0.00010822",
-    "volume": "2",
-    "volumeQuote": "0.00021644"
-  },
-  {
-    "market": "ARK-BTC",
-    "open": "0.00009327",
-    "high": "0.00009327",
-    "low": "0.00009327",
-    "last": "0.00009327",
-    "volume": "2",
-    "volumeQuote": "0.00018654"
+    "market": "ZRX-EUR",
+    "open": "0.1731",
+    "high": "0.1731",
+    "low": "0.16426",
+    "last": "0.16477",
+    "volume": "22486.29651877",
+    "volumeQuote": "3727.45",
+    "bid": "0.16436",
+    "bidSize": "898.75082725",
+    "ask": "0.16476",
+    "askSize": "419.31541176",
+    "timestamp": 1565684835335
   },
   ...
 ]
@@ -676,7 +673,7 @@ print(response)
 #### Get orders
 Returns the same as get order, but can be used to return multiple orders at once.
 ```python
-# options: orderId, limit, start, end
+# options: limit, start, end, orderIdFrom, orderIdTo
 response = bitvavo.getOrders('BTC-EUR', {})
 print(response)
 ```
@@ -861,7 +858,7 @@ print(response)
 #### Get trades
 Returns all trades within a market for this account.
 ```python
-# options: limit, start, end, tradeId
+# options: limit, start, end, tradeIdFrom, tradeIdTo
 response = bitvavo.trades('BTC-EUR', {})
 print(response)
 ```
@@ -1065,7 +1062,7 @@ print(response)
 
 ## Websockets
 
-All requests which can be done through REST requests can also be performed over websockets. Bitvavo also provides five [subscriptions](https://github.com/bitvavo/python-bitvavo-api#subscriptions). If subscribed to these, updates specific for that type/market are pushed immediately.
+All requests which can be done through REST requests can also be performed over websockets. Bitvavo also provides six [subscriptions](https://github.com/bitvavo/python-bitvavo-api#subscriptions). If subscribed to these, updates specific for that type/market are pushed immediately.
 
 ### Getting started
 
@@ -1311,7 +1308,7 @@ websocket.book('BTC-EUR', {}, ownCallback)
 
 #### Get trades per market
 ```python
-# options: limit, start, end
+# options: limit, start, end, tradeIdFrom, tradeIdTo
 websocket.publicTrades('BTC-EUR', {}, ownCallback)
 ```
 <details>
@@ -1320,40 +1317,32 @@ websocket.publicTrades('BTC-EUR', {}, ownCallback)
 ```python
 [ 
   {
-    "id": "79e4bf2f-4fac-4895-9bb2-a5c9c6e2ff3f",
-    "timestamp": 1548666712071,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": False,
-    "fee": "0.8",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "041689b3-cbb6-49ec-9964-2fb2d353dd1b",
+    "timestamp": 1565672192018,
+    "amount": "0.12735922",
+    "price": "10147",
+    "side": "sell"
   },
   {
-    "id": "102486d3-5b72-4fa2-89cf-84c934edb7ae",
-    "timestamp": 1548666561486,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": True,
-    "fee": "1",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "fb1712f2-e183-457c-b9e5-ff0d31fccd1f",
+    "timestamp": 1565672192014,
+    "amount": "0.08703703",
+    "price": "10149",
+    "side": "sell"
   },
   {
-    "id": "965facc7-b3c3-43d0-8a1d-30a2f782ee17",
-    "timestamp": 1548666373407,
-    "market": "BTC-EUR",
-    "side": "sell",
-    "amount": "0.1",
-    "price": "4000",
-    "taker": False,
-    "fee": "0.8",
-    "feeCurrency": "EUR",
-    "settled": True
+    "id": "b8cf5e20-65ca-4f45-a94c-44b7cb3952a5",
+    "timestamp": 1565672192009,
+    "amount": "0.0979994",
+    "price": "10151",
+    "side": "sell"
+  },
+  {
+    "id": "d10cc7ec-a735-4d5c-8169-c3099f8b5003",
+    "timestamp": 1565672144747,
+    "amount": "0.01975188",
+    "price": "10151",
+    "side": "sell"
   }
   ...
 ]
@@ -1473,34 +1462,32 @@ websocket.tickerBook({}, ownCallback)
 ```python
 [
   {
-    "market": "BTC-EUR",
-    "bid": "3008.8",
-    "ask": "3008.9"
-  },
-  {
-    "market": "WAVES-EUR",
-    "bid": "2.3379",
-    "ask": "2.3462"
-  },
-  {
-    "market": "ICX-EUR",
-    "bid": "0.17982",
-    "ask": "0.18066"
-  },
-  {
-    "market": "ELF-EUR",
-    "bid": "0.086931",
-    "ask": "0.087604"
+    "market": "ZIL-BTC",
+    "bid": "0.00000082",
+    "ask": "0.00000083",
+    "bidSize": "13822.00651664",
+    "askSize": "5743.88893286"
   },
   {
     "market": "ZIL-EUR",
-    "bid": "0.01858",
-    "ask": "0.018639"
+    "bid": "0.0082973",
+    "ask": "0.0084058",
+    "bidSize": "19586.15862762",
+    "askSize": "19048.86640562"
   },
   {
-    "market": "NAS-EUR",
-    "bid": "0.45109",
-    "ask": "0.45333"
+    "market": "ZRX-BTC",
+    "bid": "0.00001625",
+    "ask": "0.00001629",
+    "bidSize": "823.87743487",
+    "askSize": "868.23901671"
+  },
+  {
+    "market": "ZRX-EUR",
+    "bid": "0.16443",
+    "ask": "0.16498",
+    "bidSize": "898.35016343",
+    "askSize": "419.16696625"
   },
   ...
 ]
@@ -1518,40 +1505,46 @@ websocket.ticker24h({}, timeCallback)
 ```python
 [
   {
-    "market": "AE-BTC",
-    "open": "0.00010658",
-    "high": "0.00010658",
-    "low": "0.00010658",
-    "last": "0.00010658",
-    "volume": "2",
-    "volumeQuote": "0.00021316"
+    "market": "XVG-EUR",
+    "open": "0.0045692",
+    "high": "0.0045853",
+    "low": "0.0043599",
+    "last": "0.0044047",
+    "volume": "594786.9689017",
+    "volumeQuote": "2648.07",
+    "bid": "0.0043493",
+    "bidSize": "1561220.43836043",
+    "ask": "0.004453",
+    "askSize": "1457312.74672114",
+    "timestamp": 1565684835077
   },
   {
-    "market": "AION-BTC",
-    "open": "0.000034026",
-    "high": "0.000034026",
-    "low": "0.000034026",
-    "last": "0.000034026",
-    "volume": "2",
-    "volumeQuote": "0.00006805"
+    "market": "ZIL-EUR",
+    "open": "0.0081178",
+    "high": "0.0084196",
+    "low": "0.0077389",
+    "last": "0.0084071",
+    "volume": "950455.78568402",
+    "volumeQuote": "7687.71",
+    "bid": "0.008294",
+    "bidSize": "19593.90088084",
+    "ask": "0.0084",
+    "askSize": "19048.86640562",
+    "timestamp": 1565684834952
   },
   {
-    "market": "ANT-BTC",
-    "open": "0.00010822",
-    "high": "0.00010822",
-    "low": "0.00010822",
-    "last": "0.00010822",
-    "volume": "2",
-    "volumeQuote": "0.00021644"
-  },
-  {
-    "market": "ARK-BTC",
-    "open": "0.00009327",
-    "high": "0.00009327",
-    "low": "0.00009327",
-    "last": "0.00009327",
-    "volume": "2",
-    "volumeQuote": "0.00018654"
+    "market": "ZRX-EUR",
+    "open": "0.1731",
+    "high": "0.1731",
+    "low": "0.16426",
+    "last": "0.16477",
+    "volume": "22486.29651877",
+    "volumeQuote": "3727.45",
+    "bid": "0.16436",
+    "bidSize": "898.75082725",
+    "ask": "0.16476",
+    "askSize": "419.31541176",
+    "timestamp": 1565684835335
   },
   ...
 ]
@@ -1685,7 +1678,7 @@ websocket.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626', ownCall
 #### Get orders
 Returns the same as get order, but can be used to return multiple orders at once.
 ```python
-# options: orderId, limit, start, end
+# options: limit, start, end, orderIdFrom, orderIdTo
 websocket.getOrders('BTC-EUR', {}, ownCallback)
 ```
 <details>
@@ -1867,7 +1860,7 @@ websocket.ordersOpen({}, ownCallback)
 #### Get trades
 Returns all trades within a market for this account.
 ```python
-# options: limit, start, end, tradeId
+# options: limit, start, end, tradeIdFrom, tradeIdTo
 websocket.trades('BTC-EUR', {}, ownCallback)
 ```
 <details>
@@ -2077,8 +2070,37 @@ websocket.subscriptionTicker('BTC-EUR', ownCallback)
 {
   "event": "ticker",
   "market": "BTC-EUR",
-  "bestBid": "3000.2",
-  "bestAsk": "3002.9"
+  "bestBid": "9286.9",
+  "bestBidSize": "0.10705272",
+  "bestAsk": "9287.6",
+  "bestAskSize": "0.10990704",
+  "lastPrice": "9335"
+}
+```
+</details>
+
+#### Ticker 24 hour subscription
+Updated ticker24h objects are sent on this channel once per second. A ticker24h object is considered updated if one of the values besides timestamp has changed.
+```python
+websocket.subscriptionTicker24h('BTC-EUR', ownCallback)
+```
+<details>
+ <summary>View Response</summary>
+
+```python
+{
+  "market": "BTC-EUR",
+  "open": "10140",
+  "high": "10216",
+  "low": "10062",
+  "last": "10119",
+  "volume": "37.59541492",
+  "volumeQuote": "381752.87",
+  "bid": "10118",
+  "bidSize": "0.07267404",
+  "ask": "10119",
+  "askSize": "0.09386124",
+  "timestamp": 1565685285795
 }
 ```
 </details>

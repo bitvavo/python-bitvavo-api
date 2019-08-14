@@ -48,7 +48,7 @@ pip install python-bitvavo-api
 
 ## Rate Limiting
 
-Bitvavo uses a weight based rate limiting system, with an allowed limit of 1000 per IP or API key each minute. Please inspect each endpoint in the [documentation](https://docs.bitvavo.com/) to see the weight. Failure to respect the rate limit will result in an IP or API key ban.
+Bitvavo uses a weight based rate limiting system, with an allowed limit of 1000 per IP or API key each minute. Please inspect each endpoint in the [Bitvavo API documentation](https://docs.bitvavo.com/) to see the weight. Failure to respect the rate limit will result in an IP or API key ban.
 Since the remaining limit is returned in the header on each REST request, the remaining limit is tracked locally and can be requested through:
 ```
 limit = bitvavo.getRemainingLimit()

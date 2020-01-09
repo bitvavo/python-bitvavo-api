@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://bitvavo.com"><img src="https://bitvavo.com/media/images/logo/bitvavoGeneral.svg" width="600" title="Bitvavo Logo"></a>
+  <a href="https://bitvavo.com"><img src="https://bitvavo.com/assets/img/press/logo/dark/svg/full.svg" width="600" title="Bitvavo Logo"></a>
 </p>
 
 # Python Bitvavo Api

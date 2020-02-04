@@ -130,6 +130,8 @@ class receiveThread (threading.Thread):
 
 class Bitvavo:
   def __init__(self, options = {}):
+    self.base = "https://api.bitvavo.com/v2"
+    self.wsUrl = "wss://ws.bitvavo.com/v2/"
     self.ACCESSWINDOW = None
     self.APIKEY = ''
     self.APISECRET = ''
@@ -146,9 +148,12 @@ class Bitvavo:
         self.ACCESSWINDOW = options[key]
       elif key.lower() == "debugging":
         debugging = options[key]
+      elif key.lower() == "resturl":
+        self.base = options[key]
+      elif key.lower() == "wsurl":
+        self.wsUrl = options[key]
     if(self.ACCESSWINDOW == None):
       self.ACCESSWINDOW = 10000
-    self.base = 'https://api.bitvavo.com/v2'
 
   def getRemainingLimit(self):
     return self.rateLimitRemaining
@@ -335,13 +340,14 @@ class Bitvavo:
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 
   def newWebsocket(self):
-    return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW, self)
+    return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW, self.wsUrl, self)
 
   class websocket:
-    def __init__(self, APIKEY, APISECRET, ACCESSWINDOW, bitvavo):
+    def __init__(self, APIKEY, APISECRET, ACCESSWINDOW, WSURL, bitvavo):
       self.APIKEY = APIKEY
       self.APISECRET = APISECRET
       self.ACCESSWINDOW = ACCESSWINDOW
+      self.wsUrl = WSURL
       self.open = False
       self.callbacks = {}
       self.keepAlive = True
@@ -353,7 +359,7 @@ class Bitvavo:
 
     def subscribe(self):
       websocket.enableTrace(False)
-      ws = websocket.WebSocketApp("wss://ws.bitvavo.com/v2/", 
+      ws = websocket.WebSocketApp(self.wsUrl, 
                                 on_message = self.on_message,
                                 on_error = self.on_error,
                                 on_close = self.on_close)

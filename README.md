@@ -1,5 +1,6 @@
 <p align="center">
-  <a href="https://bitvavo.com"><img src="https://bitvavo.com/media/images/logo/bitvavoGeneral.svg" width="600" title="Bitvavo Logo"></a>
+  <br>
+  <a href="https://bitvavo.com"><img src="https://bitvavo.com/assets/static/ext/logo-shape.svg" width="100" title="Bitvavo Logo">
 </p>
 
 # Python Bitvavo Api
@@ -176,6 +177,9 @@ print(response)
     "withdrawalFee": "0.2",
     "withdrawalMinAmount": "0.2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -188,6 +192,9 @@ print(response)
     "withdrawalFee": "2",
     "withdrawalMinAmount": "2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -200,6 +207,9 @@ print(response)
     "withdrawalFee": "3",
     "withdrawalMinAmount": "3",
     "withdrawalStatus": "",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -212,6 +222,9 @@ print(response)
     "withdrawalFee": "2",
     "withdrawalMinAmount": "2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   ...
@@ -1193,6 +1206,9 @@ websocket.assets({}, ownCallback)
     "withdrawalFee": "0.2",
     "withdrawalMinAmount": "0.2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -1205,6 +1221,9 @@ websocket.assets({}, ownCallback)
     "withdrawalFee": "2",
     "withdrawalMinAmount": "2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -1217,6 +1236,9 @@ websocket.assets({}, ownCallback)
     "withdrawalFee": "3",
     "withdrawalMinAmount": "3",
     "withdrawalStatus": "",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   {
@@ -1229,6 +1251,9 @@ websocket.assets({}, ownCallback)
     "withdrawalFee": "2",
     "withdrawalMinAmount": "2",
     "withdrawalStatus": "OK",
+    "networks": [
+      "Mainnet"
+    ],
     "message": ""
   },
   ...

@@ -27,6 +27,7 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
   * Cancel Orders       [REST](https://github.com/bitvavo/python-bitvavo-api#cancel-orders) [Websocket](https://github.com/bitvavo/python-bitvavo-api#cancel-orders-1)
   * Orders Open         [REST](https://github.com/bitvavo/python-bitvavo-api#get-orders-open) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-orders-open-1)
   * Trades              [REST](https://github.com/bitvavo/python-bitvavo-api#get-trades) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-trades-1)
+  * Account             [REST](https://github.com/bitvavo/python-bitvavo-api#get-account) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-account-1)
   * Balance             [REST](https://github.com/bitvavo/python-bitvavo-api#get-balance) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-balance-1)
   * Deposit Assets     [REST](https://github.com/bitvavo/python-bitvavo-api#deposit-assets) [Websocket](https://github.com/bitvavo/python-bitvavo-api#deposit-assets-1)
   * Withdraw Assets   [REST](https://github.com/bitvavo/python-bitvavo-api#withdraw-assets) [Websocket](https://github.com/bitvavo/python-bitvavo-api#withdraw-assets-1)
@@ -563,7 +564,9 @@ print(response)
 When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote is set.
 ```python
 # optional parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection),
-# both: timeInForce, selfTradePrevention, responseRequired
+#                      stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+#                      stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+#                      all orderTypes: timeInForce, selfTradePrevention, responseRequired
 response = bitvavo.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000' })
 print(response)
 ```
@@ -601,7 +604,8 @@ print(response)
 When updating an order make sure that at least one of the optional parameters has been set. Otherwise nothing can be updated.
 ```python
 # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
-# (set at least 1) (responseRequired can be set as well, but does not update anything)
+#          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+#                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
 response = bitvavo.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amount': '1.1' })
 print(response)
 ```
@@ -920,6 +924,26 @@ print(response)
   },
   ...
 ]
+```
+</details>
+
+#### Get account
+Returns the fee tier for this account.
+```python
+response = bitvavo.account()
+print(response)
+```
+<details>
+ <summary>View Response</summary>
+
+```python
+{
+  "fees": {
+    "taker": "0.0025",
+    "maker": "0.0015",
+    "volume": "100.00"
+  }
+}
 ```
 </details>
 
@@ -1584,7 +1608,9 @@ websocket.ticker24h({}, timeCallback)
 When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote has been set.
 ```python
 # optional parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection),
-# both: timeInForce, selfTradePrevention, responseRequired
+#                      stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+#                      stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+#                      all orderTypes: timeInForce, selfTradePrevention, responseRequired
 websocket.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000' }, ownCallback)
 ```
 <details>
@@ -1621,7 +1647,8 @@ websocket.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000'
 When updating an order make sure that at least one of the optional parameters has been set. Otherwise nothing can be updated.
 ```python
 # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
-# (set at least 1) (responseRequired can be set as well, but does not update anything)
+#          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+#                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
 websocket.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amount': '1.1' }, ownCallback)
 ```
 <details>
@@ -1933,6 +1960,25 @@ websocket.trades('BTC-EUR', {}, ownCallback)
   },
   ...
 ]
+```
+</details>
+
+#### Get account
+Returns the fee tier for this account.
+```python
+websocket.account(ownCallback)
+```
+<details>
+ <summary>View Response</summary>
+
+```python
+{
+  "fees": {
+    "taker": "0.0025",
+    "maker": "0.0015",
+    "volume": "100.00"
+  }
+}
 ```
 </details>
 

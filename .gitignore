@@ -1,0 +1,4 @@
+.DS_Store
+setup.py
+dist
+python_bitvavo_api.egg-info

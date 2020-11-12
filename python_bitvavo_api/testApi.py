@@ -66,6 +66,9 @@ def testREST(bitvavo):
   # response = bitvavo.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '0.1', 'price': '2000' })
   # print(json.dumps(response, indent=2))
 
+  # response = bitvavo.placeOrder('BTC-EUR', 'sell', 'stopLoss', { amount: '0.1', 'triggerType': 'price', 'triggerReference': 'lastTrade', 'triggerAmount': '5000' })
+  # print(json.dumps(response, indent=2))
+
   # response = bitvavo.getOrder('BTC-EUR', 'dd055772-0f02-493c-a049-f4356fa0d221')
   # print(json.dumps(response, indent=2))
 
@@ -90,6 +93,9 @@ def testREST(bitvavo):
   # response = bitvavo.trades('BTC-EUR', {})
   # for item in response:
   #   print(json.dumps(item, indent=2))
+
+  # response = bitvavo.account()
+  # print(json.dumps(response, indent=2))
 
   # response = bitvavo.balance({})
   # for item in response:
@@ -142,6 +148,7 @@ def testWebsockets(bitvavo):
 
   # websocket.trades('BTC-EUR', {}, callback)
 
+  # websocket.account(callback)
   # websocket.balance({}, callback)
   # websocket.depositAssets('BTC', callback)
   # websocket.withdrawAssets('BTC', '1', 'BitcoinAddress', {}, callback)

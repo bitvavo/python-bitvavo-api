@@ -269,7 +269,10 @@ class Bitvavo:
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/24h' + postfix))
 
-  # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection), both: timeInForce, selfTradePrevention, responseRequired
+  # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection)
+  #                           stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+  #                           stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+  #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired
   def placeOrder(self, market, side, orderType, body):
     body['market'] = market
     body['side'] = side
@@ -280,8 +283,9 @@ class Bitvavo:
     postfix = createPostfix({ 'market': market, 'orderId': orderId })
     return self.privateRequest('/order', postfix, {}, 'GET')
 
-  # Optional body parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
-  # (set at least 1) (responseRequired can be set as well, but does not update anything)
+  # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
+  #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+  #                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
   def updateOrder(self, market, orderId, body):
     body['market'] = market
     body['orderId'] = orderId
@@ -312,6 +316,9 @@ class Bitvavo:
     options['market'] = market
     postfix = createPostfix(options)
     return self.privateRequest('/trades', postfix, {}, 'GET')
+
+  def account(self):
+    return self.privateRequest('/account', '', {}, 'GET')
 
   # options: symbol
   def balance(self, options):
@@ -438,6 +445,8 @@ class Bitvavo:
           callbacks['ordersOpen'](msg['response'])
         elif(msg['action'] == 'privateGetTrades'):
           callbacks['trades'](msg['response'])
+        elif(msg['action'] == 'privateGetAccount'):
+          callbacks['account'](msg['response'])
         elif(msg['action'] == 'privateGetBalance'):
           callbacks['balance'](msg['response'])
         elif(msg['action'] == 'privateDepositAssets'):
@@ -594,7 +603,10 @@ class Bitvavo:
       options['action'] = 'getTickerBook'
       self.doSend(self.ws, json.dumps(options))
 
-    # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection), both: timeInForce, selfTradePrevention, responseRequired
+    # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection)
+    #                           stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+    #                           stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+    #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired
     def placeOrder(self, market, side, orderType, body, callback):
       self.callbacks['placeOrder'] = callback
       body['market'] = market
@@ -608,8 +620,9 @@ class Bitvavo:
       options = { 'action': 'privateGetOrder', 'market': market, 'orderId': orderId }
       self.doSend(self.ws, json.dumps(options), True)
 
-    # Optional body parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
-    # (set at least 1) (responseRequired can be set as well, but does not update anything)
+    # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
+    #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
+    #                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
     def updateOrder(self, market, orderId, body, callback):
       self.callbacks['updateOrder'] = callback
       body['market'] = market
@@ -647,6 +660,10 @@ class Bitvavo:
       options['action'] = 'privateGetTrades'
       options['market'] = market
       self.doSend(self.ws, json.dumps(options), True)
+
+    def account(self, callback):
+      self.callbacks['account'] = callback
+      self.doSend(self.ws, json.dumps({ 'action': 'privateGetAccount' }), True)
 
     # options: symbol
     def balance(self, options, callback):

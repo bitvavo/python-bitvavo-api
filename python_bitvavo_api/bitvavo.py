@@ -500,6 +500,7 @@ class Bitvavo:
             callbacks['subscriptionTrades'][market](msg)
 
     def on_error(ws, error):
+      callbacks = ws.callbacks
       if('error' in callbacks):
         callbacks['error'](error)
       else:
@@ -540,7 +541,7 @@ class Bitvavo:
       if(self.APIKEY != ''):
         self.doSend(self.ws, json.dumps({ 'window':str(self.ACCESSWINDOW), 'action': 'authenticate', 'key': self.APIKEY, 'signature': createSignature(now, 'GET', '/websocket', {}, self.APISECRET), 'timestamp': now }))
       if self.reconnect:
-        debugToConsole("we started reconnecting", self.checkReconnect)
+        debugToConsole("we started reconnecting: " + str(self.checkReconnect))
         thread = threading.Thread(target = self.checkReconnect)
         thread.start()
 

@@ -395,7 +395,8 @@ class Bitvavo:
 
     def doSend(self, ws, message, private = False):
       if(private and self.APIKEY == ''):
-        errorToConsole('You did not set the API key, but requested a private function.')
+        error_msg = 'You did not set the API key, but requested a private function.'
+        self.on_error(ws, error_msg)
         return
       self.waitForSocket(ws, message, private)
       ws.send(message)
@@ -407,12 +408,9 @@ class Bitvavo:
       callbacks = ws.callbacks
 
       if('error' in msg):
+        self.on_error(ws, msg)
         if (msg['errorCode'] == 105):
           ws.bitvavo.updateRateLimit(msg)
-        if('error' in callbacks):
-          callbacks['error'](msg)
-        else:
-          errorToConsole(msg)
 
       if('action' in msg):
         if(msg['action'] == 'getTime'):

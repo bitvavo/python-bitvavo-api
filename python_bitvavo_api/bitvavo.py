@@ -102,7 +102,7 @@ class rateLimitThread (threading.Thread):
       debugToConsole('Ban should have been lifted, resetting rate limit to 1000.')
     else:
       timeToWait = (self.bitvavo.rateLimitReset / 1000) - time.time()
-      debugToConsole('Ban took longer than expected, sleeping again for', timeToWait, 'seconds.')
+      debugToConsole('Ban took longer than expected, sleeping again for ' + str(timeToWait) + ' seconds.')
       self.waitForReset(timeToWait)
 
   def run(self):
@@ -412,7 +412,7 @@ class Bitvavo:
         if('error' in callbacks):
           callbacks['error'](msg)
         else:
-          errorToConsole(msg)
+          errorToConsole(json.dumps(msg, indent=2))
 
       if('action' in msg):
         if(msg['action'] == 'getTime'):
@@ -501,7 +501,7 @@ class Bitvavo:
 
     def on_error(ws, error):
       if('error' in callbacks):
-        callbacks['error'](error)
+        ws.callbacks['error'](error)
       else:
         errorToConsole(error)
 
@@ -540,7 +540,7 @@ class Bitvavo:
       if(self.APIKEY != ''):
         self.doSend(self.ws, json.dumps({ 'window':str(self.ACCESSWINDOW), 'action': 'authenticate', 'key': self.APIKEY, 'signature': createSignature(now, 'GET', '/websocket', {}, self.APISECRET), 'timestamp': now }))
       if self.reconnect:
-        debugToConsole("we started reconnecting", self.checkReconnect)
+        debugToConsole("we started reconnecting " + str(self.checkReconnect))
         thread = threading.Thread(target = self.checkReconnect)
         thread.start()
 

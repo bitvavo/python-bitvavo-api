@@ -186,10 +186,10 @@ class Bitvavo:
       now = int(time.time() * 1000)
       sig = createSignature(now, 'GET', url.replace(self.base, ''), {}, self.APISECRET)
       headers = {
-        'Bitvavo-Access-Key': self.APIKEY,
-        'Bitvavo-Access-Signature': sig,
-        'Bitvavo-Access-Timestamp': str(now),
-        'Bitvavo-Access-Window': str(self.ACCESSWINDOW)
+        'bitvavo-access-key': self.APIKEY,
+        'bitvavo-access-signature': sig,
+        'bitvavo-access-timestamp': str(now),
+        'bitvavo-access-window': str(self.ACCESSWINDOW)
       }
       r = requests.get(url, headers = headers)
     else:
@@ -205,10 +205,10 @@ class Bitvavo:
     sig = createSignature(now, method, (endpoint + postfix), body, self.APISECRET)
     url = self.base + endpoint + postfix
     headers = {
-      'Bitvavo-Access-Key': self.APIKEY,
-      'Bitvavo-Access-Signature': sig,
-      'Bitvavo-Access-Timestamp': str(now),
-      'Bitvavo-Access-Window': str(self.ACCESSWINDOW),
+      'bitvavo-access-key': self.APIKEY,
+      'bitvavo-access-signature': sig,
+      'bitvavo-access-timestamp': str(now),
+      'bitvavo-access-window': str(self.ACCESSWINDOW),
     }
     debugToConsole("REQUEST: " + url)
     if(method == 'GET'):

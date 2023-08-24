@@ -72,7 +72,8 @@ bitvavo = Bitvavo({
   'RESTURL': 'https://api.bitvavo.com/v2',
   'WSURL': 'wss://ws.bitvavo.com/v2/',
   'ACCESSWINDOW': 10000,
-  'DEBUGGING': False
+  'DEBUGGING': False,
+  'TIMEOUT': (15, 30),  # 15 seconds for connection, 30 seconds for response
 })
 ```
 

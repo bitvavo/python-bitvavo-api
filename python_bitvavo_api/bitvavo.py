@@ -152,6 +152,8 @@ class Bitvavo:
         self.base = options[key]
       elif key.lower() == "wsurl":
         self.wsUrl = options[key]
+      elif key.lower() == "timeout":
+        self.timeout = options[key]        
     if(self.ACCESSWINDOW == None):
       self.ACCESSWINDOW = 10000
 
@@ -191,9 +193,9 @@ class Bitvavo:
         'bitvavo-access-timestamp': str(now),
         'bitvavo-access-window': str(self.ACCESSWINDOW)
       }
-      r = requests.get(url, headers = headers)
+      r = requests.get(url, headers = headers, timeout = self.timeout)
     else:
-      r = requests.get(url)
+      r = requests.get(url, timeout = self.timeout)
     if('error' in r.json()):
       self.updateRateLimit(r.json())
     else:
@@ -212,13 +214,13 @@ class Bitvavo:
     }
     debugToConsole("REQUEST: " + url)
     if(method == 'GET'):
-      r = requests.get(url, headers = headers)
+      r = requests.get(url, headers = headers, timeout = self.timeout)
     elif(method == 'DELETE'):
-      r = requests.delete(url, headers = headers)
+      r = requests.delete(url, headers = headers, timeout = self.timeout)
     elif(method == 'POST'):
-      r = requests.post(url, headers = headers, json = body)
+      r = requests.post(url, headers = headers, json = body, timeout = self.timeout)
     elif(method == 'PUT'):
-      r = requests.put(url, headers = headers, json = body)
+      r = requests.put(url, headers = headers, json = body, timeout = self.timeout)
     if('error' in r.json()):
       self.updateRateLimit(r.json())
     else:

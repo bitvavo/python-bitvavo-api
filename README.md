@@ -1,7 +1,45 @@
-<p align="center">
-  <br>
-  <a href="https://bitvavo.com"><img src="https://bitvavo.com/assets/static/ext/logo-shape.svg" width="100" title="Bitvavo Logo"></a>
-</p>
+
+<table cellspacing="0" cellpadding="0" border="0" >
+	<tr>
+		<td>
+			<table cellspacing="3" border="0">
+				<tr>
+					<td><a href="https://bitvavo.com"><img src="https://bitvavo.com/press/blue/bitvavo-mark-square/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
+					<td><h1>Bitvavo API for Python</h1></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+    <tr align="center">
+            <td rowspan="2">  <a href="https://github.com/bitvavo/python-bitvavo-api.git" alt="Downloads">
+      <img src="https://img.shields.io/npm/dt/bitvavo.svg?style=flat-square" /></a></td>
+    </tr>
+</table>
+
+Crypto starts with Bitvavo. You use Bitvavo API for Node.js to buy, sell and store over 200 digital assets on Bitvavo from inside your own app. 
+
+To trade and execute your advanced trading strategies, Bitvavo API for Node.js is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
+
+## Prerequisites
+
+To start programming with Bitvavo API for Node.js you need:
+
+- [Node.js](https://nodejs.org/en) installed on your development environment
+- An [API key and secret](https://support.bitvavo.com/hc/en-us/articles/4405059841809) associated with your Bitvavo account
+
+  You control the actions your app has rights to do using the rights you assign to the API key. Possible rights are:
+  - **View**: retrieve information about your balance, account, deposit and withdrawals.
+  - **Trade**: place, update, view and cancel orders.
+  - **Withdraw**: withdraw funds. Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
+
+## Get started 
+
+
+
+1. In your development environment, install the Bitvavo API for Node.js package from npm:
+   ```terminal
+   npm i bitvavo
+   ```
 
 # Python Bitvavo Api
 This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)

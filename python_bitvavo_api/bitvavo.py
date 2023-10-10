@@ -1,4 +1,3 @@
-from threading import Timer
 import requests
 import time
 import hmac
@@ -6,9 +5,6 @@ import hashlib
 import json
 import websocket
 import threading
-import os
-import signal
-import sys
 import datetime
 
 debugging = False
@@ -369,9 +365,9 @@ class Bitvavo:
       ws = websocket.WebSocketApp(self.wsUrl, 
                                 on_message = self.on_message,
                                 on_error = self.on_error,
-                                on_close = self.on_close)
+                                on_close = self.on_close,
+                                on_open = self.on_open)
       self.ws = ws
-      ws.on_open = self.on_open
 
       self.receiveThread = receiveThread(ws, self)
       self.receiveThread.daemon = True
@@ -394,27 +390,27 @@ class Bitvavo:
         self.waitForSocket(ws, message, private)
 
     def doSend(self, ws, message, private = False):
-      if(private and self.APIKEY == ''):
+      if private and self.APIKEY == '':
         errorToConsole('You did not set the API key, but requested a private function.')
         return
       self.waitForSocket(ws, message, private)
       ws.send(message)
       debugToConsole('SENT: ' + message)
 
-    def on_message(ws, msg):
+    def on_message(self, ws, msg):
       debugToConsole('RECEIVED: ' + msg)
       msg = json.loads(msg)
-      callbacks = ws.callbacks
+      callbacks = self.callbacks
 
-      if('error' in msg):
-        if (msg['errorCode'] == 105):
+      if 'error' in msg:
+        if msg['errorCode'] == 105:
           ws.bitvavo.updateRateLimit(msg)
-        if('error' in callbacks):
+        if 'error' in callbacks:
           callbacks['error'](msg)
         else:
           errorToConsole(json.dumps(msg, indent=2))
 
-      if('action' in msg):
+      if 'action' in msg:
         if(msg['action'] == 'getTime'):
           callbacks['time'](msg['response'])
         elif(msg['action'] == 'getMarkets'):
@@ -499,13 +495,13 @@ class Bitvavo:
           if('subscriptionTrades' in callbacks):
             callbacks['subscriptionTrades'][market](msg)
 
-    def on_error(ws, error):
-      if('error' in callbacks):
-        ws.callbacks['error'](error)
+    def on_error(self, ws, error):
+      if 'error' in self.callbacks:
+        self.callbacks['error'](error)
       else:
         errorToConsole(error)
 
-    def on_close(self):
+    def on_close(self, ws):
       self.receiveThread.exit()
       debugToConsole('Closed Websocket.')
 
@@ -533,11 +529,11 @@ class Bitvavo:
         for market in self.callbacks['subscriptionBookUser']:
           self.subscriptionBook(market, self.callbacks['subscriptionBookUser'][market])
 
-    def on_open(self):
+    def on_open(self, ws):
       now = int(time.time()*1000)
       self.open = True
       self.reconnectTimer = 0.5
-      if(self.APIKEY != ''):
+      if self.APIKEY != '':
         self.doSend(self.ws, json.dumps({ 'window':str(self.ACCESSWINDOW), 'action': 'authenticate', 'key': self.APIKEY, 'signature': createSignature(now, 'GET', '/websocket', {}, self.APISECRET), 'timestamp': now }))
       if self.reconnect:
         debugToConsole("we started reconnecting " + str(self.checkReconnect))

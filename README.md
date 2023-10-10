@@ -16,15 +16,15 @@
     </tr>
 </table>
 
-Crypto starts with Bitvavo. You use Bitvavo API for Node.js to buy, sell and store over 200 digital assets on Bitvavo from inside your own app. 
+Crypto starts with Bitvavo. You use Bitvavo API for Python to buy, sell and store over 200 digital assets on Bitvavo from inside your own app. 
 
-To trade and execute your advanced trading strategies, Bitvavo API for Node.js is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
+To trade and execute your advanced trading strategies, Bitvavo API for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
 
 ## Prerequisites
 
-To start programming with Bitvavo API for Node.js you need:
+To start programming with Bitvavo API for Python you need:
 
-- [Node.js](https://nodejs.org/en) installed on your development environment
+- [Python3](https://www.python.org/downloads/) installed on your development environment
 - An [API key and secret](https://support.bitvavo.com/hc/en-us/articles/4405059841809) associated with your Bitvavo account
 
   You control the actions your app has rights to do using the rights you assign to the API key. Possible rights are:
@@ -36,9 +36,9 @@ To start programming with Bitvavo API for Node.js you need:
 
 
 
-1. In your development environment, install the Bitvavo API for Node.js package from npm:
+1. In your development environment, install the Bitvavo API for Python package from pip:
    ```terminal
-   npm i bitvavo
+   python -m pip install python_bitvavo_api
    ```
 
 # Python Bitvavo Api

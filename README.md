@@ -55,7 +55,7 @@ To start programming with Bitvavo SDK for Python you need:
     import json
     import time
     
-      # Use this class to connect to Bitvavo and make your first calls
+      # Use this class to connect to Bitvavo and make your first calls.
       # Add workflows to implement your business logic.     
       class bitvavo_implementation:
           api_key = "<Replace with your your API key from Bitvavo Dashboard>"
@@ -77,8 +77,8 @@ To start programming with Bitvavo SDK for Python you need:
               print("Errors:", json.dumps(error, indent=2))
       
           # Retrieve the data you need from Bitvavo in order to implement your
-          # Trading logic. Use multiple workflows to return data to your
-          # Callbacks     
+          # trading logic. Use multiple workflows to return data to your
+          # callbacks     
           def a_workflow(self):   
               self.bitvavo_socket.time(self.a_workflow_callback)
               self.bitvavo_socket.markets({}, self.a_workflow_callback)

@@ -25,16 +25,24 @@ To trade and execute your advanced trading strategies, Bitvavo API for Python is
 To start programming with Bitvavo API for Python you need:
 
 - [Python3](https://www.python.org/downloads/) installed on your development environment
+
+   If you are working on MacOS, ensure that that you have installed SSH certificates:
+   ```terminal
+    open /Applications/Python\ 3.12/Install\ Certificates.command
+    open /Applications/Python\ 3.12/Update\ Shell\ Profile.command
+    ```
 - An [API key and secret](https://support.bitvavo.com/hc/en-us/articles/4405059841809) associated with your Bitvavo account
 
-  You control the actions your app has rights to do using the rights you assign to the API key. Possible rights are:
+  You control the actions your app can do using the rights you assign to the API key. Possible rights are:
   - **View**: retrieve information about your balance, account, deposit and withdrawals.
   - **Trade**: place, update, view and cancel orders.
-  - **Withdraw**: withdraw funds. Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
+  - **Withdraw**: withdraw funds.
+
+       Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
 
 ## Get started 
 
-
+1. Download this python repository 
 
 1. In your development environment, install the Bitvavo API for Python package from pip:
    ```terminal

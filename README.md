@@ -39,6 +39,8 @@ To start programming with Bitvavo SDK for Python you need:
 
 ## Get started 
 
+Want to quickly make a first app? Here we go: 
+
 1. **Install Bitvavo SDK for Python**  
 
     In your Python app, add [Bitvavo SDK for Python](https://github.com/bitvavo/python-bitvavo-api) from [pypi.org](https://pypi.org/project/python-bitvavo-api/):

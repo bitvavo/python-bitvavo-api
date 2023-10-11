@@ -5,7 +5,7 @@
 			<table cellspacing="3" border="0">
 				<tr>
 					<td><a href="https://bitvavo.com"><img src="https://bitvavo.com/press/blue/bitvavo-mark-square/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
-					<td><h1>Bitvavo API for Python</h1></td>
+					<td><h1>Bitvavo SDK for Python</h1></td>
 				</tr>
 			</table>
 		</td>
@@ -16,13 +16,13 @@
     </tr>
 </table>
 
-Crypto starts with Bitvavo. You use Bitvavo API for Python to buy, sell and store over 200 digital assets on Bitvavo from inside your own app. 
+Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your own app. 
 
-To trade and execute your advanced trading strategies, Bitvavo API for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
+To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
 
 ## Prerequisites
 
-To start programming with Bitvavo API for Python you need:
+To start programming with Bitvavo SDK for Python you need:
 
 - [Python3](https://www.python.org/downloads/) installed on your development environment
 
@@ -31,6 +31,7 @@ To start programming with Bitvavo API for Python you need:
     open /Applications/Python\ 3.12/Install\ Certificates.command
     open /Applications/Python\ 3.12/Update\ Shell\ Profile.command
     ```
+- A Python app. Use your favorite IDE, or run from the command line.
 - An [API key and secret](https://support.bitvavo.com/hc/en-us/articles/4405059841809) associated with your Bitvavo account
 
   You control the actions your app can do using the rights you assign to the API key. Possible rights are:
@@ -42,12 +43,83 @@ To start programming with Bitvavo API for Python you need:
 
 ## Get started 
 
-1. Download this python repository 
+1. **Install Bitvavo SDK for Python**  
 
-1. In your development environment, install the Bitvavo API for Python package from pip:
-   ```terminal
-   python -m pip install python_bitvavo_api
-   ```
+    In your Python app, add [Bitvavo SDK for Python](https://github.com/bitvavo/python-bitvavo-api) from [pypi.org](https://pypi.org/project/python-bitvavo-api/):
+     ```terminal
+     python -m pip install python_bitvavo_api
+     ```
+1. **Create a simple Bitvavo implementation**
+
+    Add the following code in a new file in your app:
+
+    ```python
+    # Import Bitvavo SDK for Python
+    from python_bitvavo_api.bitvavo import Bitvavo
+    import json
+    import time
+    
+      # Use this class to connect to Bitvavo and make your first calls
+      # Add workflows to implement your business logic.     
+      class bitvavo_implementation:
+          api_key = "<Replace with your your API key from Bitvavo Dashboard>"
+          api_secret = "<Replace with your API secrete from Bitvavo Dashboard>"
+          bitvavo_engine = None
+          bitvavo_socket = None
+   
+          # Connect securely to Bitvavo, create the websocket and error callbacks   
+          def __init__(self):  
+              self.bitvavo_engine = Bitvavo({
+                  'APIKEY': self.api_key,
+                  'APISECRET': self.api_secret
+                })
+              self.bitvavo_socket = self.bitvavo_engine.newWebsocket()
+              self.bitvavo_socket.setErrorCallback(self.error_callback)
+      
+          # Handle errors   
+          def error_callback(self, error):
+              print("Errors:", json.dumps(error, indent=2))
+      
+          # Retrieve the data you need from Bitvavo in order to implement your
+          # Trading logic. Use multiple workflows to return data to your
+          # Callbacks     
+          def a_workflow(self):   
+              self.bitvavo_socket.time(self.a_workflow_callback)
+              self.bitvavo_socket.markets({}, self.a_workflow_callback)
+   
+          # In your app you analyse data returned by the workflow, then make
+          # calls to Bitvavo to respond to market conditions  
+          def a_workflow_callback(self, response):  
+              print("workflow:", json.dumps(response, indent=2))
+      
+          # Sockets are fast, but asynchronous. Keep the socket open while you are 
+          # trading.      
+          def wait_and_close(self):
+              limit = self.bitvavo_engine.getRemainingLimit()
+              try:
+                  while (limit > 0):
+                      time.sleep(0.5)
+                      limit = self.bitvavo_engine.getRemainingLimit()
+              except KeyboardInterrupt:
+                  self.bitvavo_socket.closeSocket()
+      
+      # Shall I re-explain main? Naaaaaaaaaa.  
+      if __name__ == '__main__':
+          bvavo = bitvavo_implementation()
+          bvavo.a_workflow()
+          bvavo.wait_and_close()
+
+    ```
+1. **Add security information**
+
+    Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api).
+
+1. **Run your app**
+
+    - Command line warriors: `python3 <filename>`.
+    - IDE heroes: press the big green button.
+ 
+Your app connects to Bitvavo and returns a list of the current market prices. 
 
 # Python Bitvavo Api
 This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)

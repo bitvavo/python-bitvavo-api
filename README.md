@@ -4,16 +4,12 @@
 		<td>
 			<table cellspacing="3" border="0">
 				<tr>
-					<td><a href="https://bitvavo.com"><img src="https://bitvavo.com/press/blue/bitvavo-mark-square/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
+					<td><a href="https://bitvavo.com"><img src="https://bitvavo.com/press/blue/bitvavo-mark-square/bitvavo-mark-square-blue.png" width="100" title="Bitvavo Logo"></td>
 					<td><h1>Bitvavo SDK for Python</h1></td>
 				</tr>
 			</table>
 		</td>
 	</tr>
-    <tr align="center">
-            <td rowspan="2">  <a href="https://github.com/bitvavo/python-bitvavo-api.git" alt="Downloads">
-      <img src="https://img.shields.io/npm/dt/bitvavo.svg?style=flat-square" /></a></td>
-    </tr>
 </table>
 
 Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your own app. 

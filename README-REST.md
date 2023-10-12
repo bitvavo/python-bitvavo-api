@@ -4,7 +4,7 @@
 		<td>
 			<table cellspacing="3" border="0">
 				<tr>
-					<td><a href="https://bitvavo.com"><img src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
+					<td><a href="https://bitvavo.com"><img src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"/></td>
 					<td><h1>Bitvavo SDK for Python</h1></td>
 				</tr>
 			</table>
@@ -16,11 +16,10 @@ Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and sto
 
 To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/).
 
-- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python.
-- [Get started](#get-started) - rapidy create an app and start trading with Bitvavo. 
+- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python. 
 - [API reference](#api-reference) - in-depth information about Bitvavo SDK for Python
 
-This page shows you how to use Bitvavo SDK for Python with websockets. For REST, see [Readme-rest](./README-REST.md).
+This page gives reference information for REST calls made using Bitvavo SDK for Python.
 
 ## Prerequisites
 
@@ -41,113 +40,7 @@ To start programming with Bitvavo SDK for Python you need:
   - **Trade**: place, update, view and cancel orders.
   - **Withdraw**: withdraw funds.
 
-       Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
-
-## Get started
-
-Want to quickly make a first app? Here we go: 
-
-1. **Install Bitvavo SDK for Python**  
-
-    In your Python app, add [Bitvavo SDK for Python](https://github.com/bitvavo/python-bitvavo-api) from [pypi.org](https://pypi.org/project/python-bitvavo-api/):
-     ```terminal
-     python -m pip install python_bitvavo_api
-     ```
-1. **Create a simple Bitvavo implementation**
-
-    Add the following code to a new file in your app:
-
-    ```python
-    # Import Bitvavo SDK for Python
-    from python_bitvavo_api.bitvavo import Bitvavo
-    import json
-    import time
-    
-    
-    # Use this class to connect to Bitvavo and make your first calls
-    # Add trading strategies to implement your business logic.
-    class bitvavo_implementation:
-        api_key = "<Replace with your your API key from Bitvavo Dashboard>"
-        api_secret = "<Replace with your API secrete from Bitvavo Dashboard>"
-        bitvavo_engine = None
-        bitvavo_socket = None
-    
-        # Connect securely to Bitvavo, create the websocket and error callbacks
-        def __init__(self):
-            self.bitvavo_engine = Bitvavo({
-                'APIKEY': self.api_key,
-                'APISECRET': self.api_secret
-            })
-            self.bitvavo_socket = self.bitvavo_engine.newWebsocket()
-            self.bitvavo_socket.setErrorCallback(self.error_callback)
-    
-        # Handle errors
-        def error_callback(self, error):
-            print("Errors:", json.dumps(error, indent=2))
-    
-        # Retrieve the data you need from Bitvavo in order to implement your
-        # Trading logic. Use multiple workflows to return data to your
-        # Callbacks
-        def a_trading_strategy(self):
-            self.bitvavo_socket.ticker24h({}, self.a_trading_strategy_callback)
-            # You can also filter the ticker to retrieve specific markets only. 
-    
-        # In your app you analyse data returned by the workflow, then make
-        # calls to Bitvavo to respond to market conditions
-        def a_trading_strategy_callback(self, response):
-            # Iterate through the
-            for market in response:
-                match market["market"]:
-                   case "A market":
-                        print("Check data against your trading strategy. For example, the bid is: ", market["bid"] )
-                        # Implement calculations for your trading logic
-                        # If they are positive, place an order: For example:
-                        # self.bitvavo_socket.placeOrder("A market",
-                        #                               'buy',
-                        #                               'limit',
-                        #                               { 'amount': '1', 'price': '00001' },
-                        #                               self.order_placed_callback)
-                   case "a different market":
-                        print("Implement a different strategy for this market")
-    
-    
-        def order_placed_callback(self, response):
-            print("Order placed:", json.dumps(response, indent=2))
-            # Add your business logic to handle orders
-    
-    
-        # Sockets are fast, but asynchronous. Keep the socket open while you are
-        # trading.
-        def wait_and_close(self):
-            limit = self.bitvavo_engine.getRemainingLimit()
-            try:
-                while (limit > 0):
-                    time.sleep(0.5)
-                    limit = self.bitvavo_engine.getRemainingLimit()
-            except KeyboardInterrupt:
-                self.bitvavo_socket.closeSocket()
-    
-    
-    # Shall I re-explain main? Naaaaaaaaaa.
-    if __name__ == '__main__':
-        bvavo = bitvavo_implementation()
-        bvavo.a_trading_strategy()
-        bvavo.wait_and_close()
-    ```
-1. **Add security information**
-
-    Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api).
-    
-    You must supply your security information to trade on Bitvavo and see your account details. You can retrieve public information such as available markets, assets and current market without 
-    supplying your key and secret. However, Bitvavo returns an error. 
-
-1. **Run your app**
-
-    - Command line warriors: `python3 <filename>`.
-    - IDE heroes: press the big green button.
- 
-Your app connects to Bitvavo and returns a list the latest trade price for each market. The callback cycles through the 
-market data so you can implement your trading logic. 
+       Best practice is to not grant his privilege, withdrawals using the API do not require 2FA and e-mail confirmation.
 
 ## API reference
 
@@ -157,38 +50,30 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
   * [Rate limiting](#rate-limiting)
   * [REST requests](#rest-requests) 
   * [Time](#get-time)
-  * [Markets](#get-markets)
-  * [Assets](#get-assets)
+  * [Markets](https://github.com/bitvavo/python-bitvavo-api#get-markets)
+  * [Assets](https://github.com/bitvavo/python-bitvavo-api#get-assets)
 * [Public market data](#public-market-data)
-  * [Book](#get-book-per-market)
-  * [Public Trades](#get-trades-per-market)
-  * [Candles](#get-candles-per-market)
-  * [Price Ticker](#get-price-ticker)
-  * [Book Ticker](#get-book-ticker)
-  * [24 Hour Ticker](#get-24-hour-ticker)
+  * [Book](https://github.com/bitvavo/python-bitvavo-api#get-book-per-market)
+  * [Public Trades](https://github.com/bitvavo/python-bitvavo-api#get-trades-per-market)
+  * [Candles](https://github.com/bitvavo/python-bitvavo-api#get-candles-per-market)
+  * [Price Ticker](https://github.com/bitvavo/python-bitvavo-api#get-price-ticker)
+  * [Book Ticker](https://github.com/bitvavo/python-bitvavo-api#get-book-ticker)
+  * [24 Hour Ticker](https://github.com/bitvavo/python-bitvavo-api#get-24-hour-ticker)
 * [Private trading data](#private-trading-data)
-  * [Place Order](#place-order)
-  * [Update Order](#update-order)
-  * [Get Order](#get-order)
-  * [Cancel Order](#cancel-order)
-  * [Get Orders](#get-orders)
-  * [Cancel Orders](#cancel-orders)
-  * [Orders Open](#get-orders-open)
-  * [Trades](#get-trades)
-  * [Account](#get-account)
-  * [Balance](#get-balance)
-  * [Deposit](#deposit-assets)
-  * [Withdraw](#withdraw-assets)
-  * [Deposit History](#get-deposit-history)
-  * [Withdrawal History](#get-withdrawal-history)
-* [Subscriptions](#subscriptions)
-  * [Ticker Subscription](#ticker-subscription)
-  * [Ticker 24 Hour Subscription](#ticker-24-hour-subscription)
-  * [Account Subscription](#account-subscription)
-  * [Candles Subscription](#candles-subscription)
-  * [Trades Subscription](#trades-subscription)
-  * [Book Subscription](#book-subscription)
-  * [Book subscription with local copy](#book-subscription-with-local-copy)
+  * [Place Order](https://github.com/bitvavo/python-bitvavo-api#place-order)
+  * [Update Order](https://github.com/bitvavo/python-bitvavo-api#update-order)
+  * [Get Order](https://github.com/bitvavo/python-bitvavo-api#get-order)
+  * [Cancel Order](https://github.com/bitvavo/python-bitvavo-api#cancel-order)
+  * [Get Orders](https://github.com/bitvavo/python-bitvavo-api#get-orders)
+  * [Cancel Orders](https://github.com/bitvavo/python-bitvavo-api#cancel-orders)
+  * [Orders Open](https://github.com/bitvavo/python-bitvavo-api#get-orders-open)
+  * [Trades](https://github.com/bitvavo/python-bitvavo-api#get-trades)
+  * [Account](https://github.com/bitvavo/python-bitvavo-api#get-account)
+  * [Balance](https://github.com/bitvavo/python-bitvavo-api#get-balance)
+  * [Deposit Assets](https://github.com/bitvavo/python-bitvavo-api#deposit-assets)
+  * [Withdraw Assets](https://github.com/bitvavo/python-bitvavo-api#withdraw-assets)
+  * [Deposit History](https://github.com/bitvavo/python-bitvavo-api#get-deposit-history)
+  * [Withdrawal History](https://github.com/bitvavo/python-bitvavo-api#get-withdrawal-history)
 
 ### General
 
@@ -209,7 +94,7 @@ The rate weighting for each endpoint is supplied in the [Bitvavo API documentati
 #### REST requests
 
 For all functions, required parameters are passed as separate values, optional parameters are passed as a dictionary; 
-return parameters are in dictionary format such that `response['<key>'] = '<value>'`.  Only when [placing orders](#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. 
+return parameters are in dictionary format such that `response['<key>'] = '<value>'`.  Only when [placing orders](https://github.com/bitvavo/python-bitvavo-api#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. 
 
 #### Get time
 ```python
@@ -226,26 +111,11 @@ print(response)
 ```
 </details>
 
-### Public market data
-
-#### Get time
-```python
-websocket.time(ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "time": 1543397021396
-}
-```
-</details>
-
 #### Get markets
 ```python
 # options: market
-websocket.markets({}, ownCallback)
+response = bitvavo.markets({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -310,7 +180,8 @@ websocket.markets({}, ownCallback)
 #### Get assets
 ```python
 # options: symbol
-websocket.assets({}, ownCallback)
+response = bitvavo.assets({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -382,10 +253,13 @@ websocket.assets({}, ownCallback)
 ```
 </details>
 
+### Market Data
+
 #### Get book per market
 ```python
 # options: depth
-websocket.book('BTC-EUR', {}, ownCallback)
+response = bitvavo.book('BTC-EUR', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -455,7 +329,8 @@ websocket.book('BTC-EUR', {}, ownCallback)
 #### Get trades per market
 ```python
 # options: limit, start, end, tradeIdFrom, tradeIdTo
-websocket.publicTrades('BTC-EUR', {}, ownCallback)
+response = bitvavo.publicTrades('BTC-EUR', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -497,8 +372,9 @@ websocket.publicTrades('BTC-EUR', {}, ownCallback)
 
 #### Get candles per market
 ```python
-# options: limit
-websocket.candles('BTC-EUR', '1h', {}, ownCallback)
+# options: limit, start, end
+response = bitvavo.candles('BTC-EUR', '1h', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -553,7 +429,8 @@ websocket.candles('BTC-EUR', '1h', {}, ownCallback)
 #### Get price ticker
 ```python
 # options: market
-websocket.tickerPrice({}, ownCallback)
+response = bitvavo.tickerPrice({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -600,7 +477,8 @@ websocket.tickerPrice({}, ownCallback)
 #### Get book ticker
 ```python
 # options: market
-websocket.tickerBook({}, ownCallback)
+response = bitvavo.tickerBook({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -643,7 +521,8 @@ websocket.tickerBook({}, ownCallback)
 #### Get 24 hour ticker
 ```python
 # options: market
-websocket.ticker24h({}, timeCallback)
+response = bitvavo.ticker24h({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -697,16 +576,17 @@ websocket.ticker24h({}, timeCallback)
 ```
 </details>
 
-### Private
+### Private trading data
 
 #### Place order
-When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote has been set.
+When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote is set.
 ```python
 # optional parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection),
 #                      stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
 #                      stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
 #                      all orderTypes: timeInForce, selfTradePrevention, responseRequired
-websocket.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000' }, ownCallback)
+response = bitvavo.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000' })
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -744,7 +624,8 @@ When updating an order make sure that at least one of the optional parameters ha
 # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
 #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
 #                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
-websocket.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amount': '1.1' }, ownCallback)
+response = bitvavo.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amount': '1.1' })
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -778,7 +659,8 @@ websocket.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amou
 
 #### Get order
 ```python
-websocket.getOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', ownCallback)
+response = bitvavo.getOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e')
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -812,7 +694,8 @@ websocket.getOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', ownCallbac
 
 #### Cancel order
 ```python
-websocket.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626', ownCallback)
+response = bitvavo.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626')
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -828,7 +711,8 @@ websocket.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626', ownCall
 Returns the same as get order, but can be used to return multiple orders at once.
 ```python
 # options: limit, start, end, orderIdFrom, orderIdTo
-websocket.getOrders('BTC-EUR', {}, ownCallback)
+response = bitvavo.getOrders('BTC-EUR', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -912,7 +796,8 @@ websocket.getOrders('BTC-EUR', {}, ownCallback)
 Cancels all orders in a market. If no market is specified, all orders of an account will be canceled.
 ```python
 # options: market
-websocket.cancelOrders({}, ownCallback)
+response = bitvavo.cancelOrders({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -937,7 +822,8 @@ websocket.cancelOrders({}, ownCallback)
 Returns all orders which are not filled or canceled.
 ```python
 # options: market
-websocket.ordersOpen({}, ownCallback)
+response = bitvavo.ordersOpen({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1010,7 +896,8 @@ websocket.ordersOpen({}, ownCallback)
 Returns all trades within a market for this account.
 ```python
 # options: limit, start, end, tradeIdFrom, tradeIdTo
-websocket.trades('BTC-EUR', {}, ownCallback)
+response = bitvavo.trades('BTC-EUR', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1061,7 +948,8 @@ websocket.trades('BTC-EUR', {}, ownCallback)
 #### Get account
 Returns the fee tier for this account.
 ```python
-websocket.account(ownCallback)
+response = bitvavo.account()
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1081,7 +969,8 @@ websocket.account(ownCallback)
 Returns the balance for this account.
 ```python
 # options: symbol
-websocket.balance({}, ownCallback)
+response = bitvavo.balance({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1121,7 +1010,8 @@ websocket.balance({}, ownCallback)
 #### Deposit assets
 Returns the address which can be used to deposit funds.
 ```python
-websocket.depositAssets('BTC', ownCallback)
+response = bitvavo.depositAssets('BTC')
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1137,7 +1027,8 @@ websocket.depositAssets('BTC', ownCallback)
 Can be used to withdraw funds from Bitvavo.
 ```python
 # optional parameters: paymentId, internal, addWithdrawalFee
-websocket.withdrawAssets('BTC', '1', 'BitcoinAddress', {}, ownCallback)
+response = bitvavo.withdrawAssets('BTC', '1', 'BitcoinAddress', {})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1155,7 +1046,8 @@ websocket.withdrawAssets('BTC', '1', 'BitcoinAddress', {}, ownCallback)
 Returns the deposit history of your account.
 ```python
 # options: symbol, limit, start, end
-websocket.depositHistory({}, ownCallback)
+response = bitvavo.depositHistory({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1187,7 +1079,8 @@ websocket.depositHistory({}, ownCallback)
 Returns the withdrawal history of an account.
 ```python
 # options: symbol, limit, start, end
-websocket.withdrawalHistory({}, ownCallback)
+response = bitvavo.withdrawalHistory({})
+print(response)
 ```
 <details>
  <summary>View Response</summary>
@@ -1224,226 +1117,6 @@ websocket.withdrawalHistory({}, ownCallback)
 ```
 </details>
 
-### Subscriptions
 
-#### Ticker subscription
-Sends an update every time the best bid, best ask or last price changed.
-```python
-websocket.subscriptionTicker('BTC-EUR', ownCallback)
-```
-<details>
- <summary>View Response</summary>
 
-```python
-{
-  "event": "ticker",
-  "market": "BTC-EUR",
-  "bestBid": "9286.9",
-  "bestBidSize": "0.10705272",
-  "bestAsk": "9287.6",
-  "bestAskSize": "0.10990704",
-  "lastPrice": "9335"
-}
-```
-</details>
 
-#### Ticker 24 hour subscription
-Updated ticker24h objects are sent on this channel once per second. A ticker24h object is considered updated if one of the values besides timestamp has changed.
-```python
-websocket.subscriptionTicker24h('BTC-EUR', ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "market": "BTC-EUR",
-  "open": "10140",
-  "high": "10216",
-  "low": "10062",
-  "last": "10119",
-  "volume": "37.59541492",
-  "volumeQuote": "381752.87",
-  "bid": "10118",
-  "bidSize": "0.07267404",
-  "ask": "10119",
-  "askSize": "0.09386124",
-  "timestamp": 1565685285795
-}
-```
-</details>
-
-#### Account subscription
-Sends an update whenever an event happens which is related to the account. These are ‘order’ events (create, update, cancel) or ‘fill’ events (a trade occurred).
-```python
-websocket.subscriptionAccount("BTC-EUR", ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-Fill:
-{
-  "event": "fill",
-  "timestamp": 1548674189411,
-  "market": "BTC-EUR",
-  "orderId": "78fef2d4-6278-4f4b-ade9-1a1c438680e5",
-  "fillId": "90d49d30-9d90-427d-ab4d-35d18c3356cb",
-  "side": "buy",
-  "amount": "0.03322362",
-  "price": "3002.4",
-  "taker": true,
-  "fee": "0.249403312",
-  "feeCurrency": "EUR"
-}
-
-Order:
-{
-  "event": "order",
-  "orderId": "78fef2d4-6278-4f4b-ade9-1a1c438680e5",
-  "market": "BTC-EUR",
-  "created": 1548674189406,
-  "updated": 1548674189406,
-  "status": "filled",
-  "side": "buy",
-  "orderType": "market",
-  "amountQuote": "100",
-  "amountQuoteRemaining": "0.249403312",
-  "onHold": "0",
-  "onHoldCurrency": "EUR",
-  "selfTradePrevention": "decrementAndCancel",
-  "visible": false,
-  "disableMarketProtection": false
-}
-```
-</details>
-
-#### Candles subscription
-Sends an updated candle after each trade for the specified interval and market.
-```python
-websocket.subscriptionCandles('BTC-EUR', '1h', ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "event": "candle",
-  "market": "BTC-EUR",
-  "interval": "1h",
-  "candle": [
-    [
-      1548676800000,
-      "2999.3",
-      "2999.3",
-      "2990.5",
-      "2999.3",
-      "11.15058838"
-    ]
-  ]
-}
-```
-</details>
-
-#### Trades subscription
-Sends an update whenever a trade has happened on this market. For your own trades, please subscribe to account.
-```python
-websocket.subscriptionTrades('BTC-EUR', ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "event": "trade",
-  "timestamp": 1548677539543,
-  "market": "BTC-EUR",
-  "id": "d91bf798-e704-4f09-95f7-3444f8109346",
-  "amount": "0.88114879",
-  "price": "2992.2",
-  "side": "buy"
-}
-```
-</details>
-
-#### Book subscription
-Sends an update whenever the order book for this specific market has changed. A list of tuples ([price, amount]) are returned, where amount ‘0’ means that there are no more orders at this price. If you wish to maintain your own copy of the order book, consider using the next function.
-```python
-websocket.subscriptionBookUpdate('BTC-EUR', ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "event": "book",
-  "market": "BTC-EUR",
-  "nonce": 14870,
-  "bids": [
-    [
-      "2994.3",
-      "0"
-    ],
-    [
-      "2994.2",
-      "0.00334147"
-    ]
-  ],
-  "asks": []
-}
-```
-</details>
-
-#### Book subscription with local copy
-This is a combination of get book per market and the book subscription which maintains a local copy. On every update to the order book, the entire order book is returned to the callback, while the book subscription will only return updates to the book.
-```python
-websocket.subscriptionBook('BTC-EUR', ownCallback)
-```
-<details>
- <summary>View Response</summary>
-
-```python
-{
-  "bids": [
-    [
-      "2996.7",
-      "0.36620062"
-    ],
-    [
-      "2994.8",
-      "0.04231826"
-    ],
-    [
-      "2994.2",
-      "0.16617026"
-    ],
-    [
-      "2993.7",
-      "0.23002489"
-    ],
-    ...
-  ],
-  "asks": [
-    [
-      "2998.6",
-      "8.64251588"
-    ],
-    [
-      "3001.2",
-      "5.91405558"
-    ],
-    [
-      "3002.4",
-      "3.5765691"
-    ],
-    [
-      "3003.9",
-      "3.842524"
-    ],
-    ...
-  ],
-  "nonce": 21919,
-  "market": "BTC-EUR"
-}
-```
-</details>

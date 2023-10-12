@@ -16,6 +16,10 @@ Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and sto
 
 To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/) 
 
+- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python.
+- [Get started](#get-started) - rapidy create an app and start trading with Bitvavo. 
+- [API reference](#api-reference) - in-depth information about Bitvavo SDK for Python
+
 ## Prerequisites
 
 To start programming with Bitvavo SDK for Python you need:
@@ -37,7 +41,7 @@ To start programming with Bitvavo SDK for Python you need:
 
        Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
 
-## Get started 
+## Get started
 
 Want to quickly make a first app? Here we go: 
 
@@ -143,22 +147,24 @@ Want to quickly make a first app? Here we go:
 Your app connects to Bitvavo and returns a list the latest trade price for each market. The callback cycles through the 
 market data so you can implement your trading logic. 
 
-# Python Bitvavo Api
+## API reference
+
 This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)
 
-* Getting started       [REST](https://github.com/bitvavo/python-bitvavo-api#getting-started) [Websocket](https://github.com/bitvavo/python-bitvavo-api#getting-started-1)
-* General
+* [General](#general)
+  * Rate limiting       [x-platform](#rate-limiting)
+  * REST requests       [x-platform](#rest-requests) 
   * Time                [REST](https://github.com/bitvavo/python-bitvavo-api#get-time) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-time-1)
   * Markets             [REST](https://github.com/bitvavo/python-bitvavo-api#get-markets) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-markets-1)
   * Assets              [REST](https://github.com/bitvavo/python-bitvavo-api#get-assets) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-assets-1)
-* Market Data
+* [Public market data](#public-market-data)
   * Book                [REST](https://github.com/bitvavo/python-bitvavo-api#get-book-per-market) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-book-per-market-1)
   * Public Trades       [REST](https://github.com/bitvavo/python-bitvavo-api#get-trades-per-market) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-trades-per-market-1)
   * Candles             [REST](https://github.com/bitvavo/python-bitvavo-api#get-candles-per-market) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-candles-per-market-1)
   * Price Ticker        [REST](https://github.com/bitvavo/python-bitvavo-api#get-price-ticker) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-price-ticker-1)
   * Book Ticker         [REST](https://github.com/bitvavo/python-bitvavo-api#get-book-ticker) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-book-ticker-1)
   * 24 Hour Ticker      [REST](https://github.com/bitvavo/python-bitvavo-api#get-24-hour-ticker) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-24-hour-ticker-1)
-* Private 
+* [Private trading data](#private-trading-data)
   * Place Order         [REST](https://github.com/bitvavo/python-bitvavo-api#place-order) [Websocket](https://github.com/bitvavo/python-bitvavo-api#place-order-1)
   * Update Order        [REST](https://github.com/bitvavo/python-bitvavo-api#update-order) [Websocket](https://github.com/bitvavo/python-bitvavo-api#update-order-1)
   * Get Order           [REST](https://github.com/bitvavo/python-bitvavo-api#get-order) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-order-1)
@@ -173,7 +179,7 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
   * Withdraw Assets   [REST](https://github.com/bitvavo/python-bitvavo-api#withdraw-assets) [Websocket](https://github.com/bitvavo/python-bitvavo-api#withdraw-assets-1)
   * Deposit History     [REST](https://github.com/bitvavo/python-bitvavo-api#get-deposit-history) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-deposit-history-1)
   * Withdrawal History  [REST](https://github.com/bitvavo/python-bitvavo-api#get-withdrawal-history) [Websocket](https://github.com/bitvavo/python-bitvavo-api#get-withdrawal-history-1)
-* [Subscriptions](https://github.com/bitvavo/python-bitvavo-api#subscriptions)
+* [Subscriptions](#subscriptions)
   * [Ticker Subscription](https://github.com/bitvavo/python-bitvavo-api#ticker-subscription)
   * [Ticker 24 Hour Subscription](https://github.com/bitvavo/python-bitvavo-api#ticker-24-hour-subscription)
   * [Account Subscription](https://github.com/bitvavo/python-bitvavo-api#account-subscription)
@@ -182,41 +188,26 @@ This is the python wrapper for the Bitvavo API. This project can be used to buil
   * [Book Subscription](https://github.com/bitvavo/python-bitvavo-api#book-subscription)
   * [Book subscription with local copy](https://github.com/bitvavo/python-bitvavo-api#book-subscription-with-local-copy)
 
+### General
 
-## Installation
-```
-pip install python-bitvavo-api
-```
+#### Rate limiting
 
-## Rate Limiting
+Bitvavo uses a weight based rate limiting system. Your app is limited to 1000 weight points per IP or API key per 
+minute. When you make a call to Bitvavo API, your remaining weight points are returned in the header of each REST request. 
 
-Bitvavo uses a weight based rate limiting system, with an allowed limit of 1000 per IP or API key each minute. Please inspect each endpoint in the [Bitvavo API documentation](https://docs.bitvavo.com/) to see the weight. Failure to respect the rate limit will result in an IP or API key ban.
-Since the remaining limit is returned in the header on each REST request, the remaining limit is tracked locally and can be requested through:
+Websocket functions do not return your returning weight points, you track your remaining weight points with a call to:
 ```
 limit = bitvavo.getRemainingLimit()
 ```
-The websocket functions however do not return a remaining limit, therefore the limit is only updated locally once a ban has been issued.
 
-## REST requests
+If you make more requests than permitted by the weight limit, your IP or API key is banned. 
 
-The general convention used in all functions (both REST and websockets), is that all optional parameters are passed as an dictionary, while required parameters are passed as separate values. Only when [placing orders](https://github.com/bitvavo/python-bitvavo-api#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. The returned responses are all converted to a dictionary as well, such that `response['<key>'] = '<value>'`.
+The rate weighting for each endpoint is supplied in the [Bitvavo API documentation](https://docs.bitvavo.com/).
 
-### Getting started
+#### REST requests
 
-The API key and secret are required for private calls and optional for public calls. The access window and debugging parameter are optional for all calls. The access window is used to determine whether the request arrived within time, the value is specified in milliseconds. You can use the [time](https://github.com/bitvavo/python-bitvavo-api#get-time) function to synchronize your time to our server time if errors arise. REST url and WS url can be used to set a different endpoint (for testing purposes). Debugging should be set to true when you want to log additional information and full responses. Any parameter can be omitted, private functions will return an error when the api key and secret have not been set.
-```python
-from python_bitvavo_api.bitvavo import Bitvavo
-bitvavo = Bitvavo({
-  'APIKEY': '<APIKEY>',
-  'APISECRET': '<APISECRET>',
-  'RESTURL': 'https://api.bitvavo.com/v2',
-  'WSURL': 'wss://ws.bitvavo.com/v2/',
-  'ACCESSWINDOW': 10000,
-  'DEBUGGING': False
-})
-```
-
-### General
+For all functions, required parameters are passed as separate values, optional parameters are passed as a dictionary; 
+return parameters are in dictionary format such that `response['<key>'] = '<value>'`.  Only when [placing orders](https://github.com/bitvavo/python-bitvavo-api#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. 
 
 #### Get time
 ```python
@@ -698,7 +689,7 @@ print(response)
 ```
 </details>
 
-### Private
+### Private trading data
 
 #### Place order
 When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote is set.
@@ -1271,7 +1262,7 @@ except KeyboardInterrupt:
 
 The api key and secret are copied from the bitvavo object. Therefore if you want to use the private portion of the websockets API, you should set both the key and secret as specified in [REST requests](https://github.com/bitvavo/python-bitvavo-api#rest-requests).
 
-### Public
+### Public market data
 
 #### Get time
 ```python

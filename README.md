@@ -4,7 +4,7 @@
 		<td>
 			<table cellspacing="3" border="0">
 				<tr>
-					<td><a href="https://bitvavo.com"><img src="https://bitvavo.com/press/blue/bitvavo-mark-square/bitvavo-mark-square-blue.png" width="100" title="Bitvavo Logo"></td>
+					<td><a href="https://bitvavo.com"><img src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
 					<td><h1>Bitvavo SDK for Python</h1></td>
 				</tr>
 			</table>
@@ -57,67 +57,91 @@ Want to quickly make a first app? Here we go:
     import json
     import time
     
-      # Use this class to connect to Bitvavo and make your first calls.
-      # Add workflows to implement your business logic.     
-      class bitvavo_implementation:
-          api_key = "<Replace with your your API key from Bitvavo Dashboard>"
-          api_secret = "<Replace with your API secrete from Bitvavo Dashboard>"
-          bitvavo_engine = None
-          bitvavo_socket = None
-   
-          # Connect securely to Bitvavo, create the websocket and error callbacks   
-          def __init__(self):  
-              self.bitvavo_engine = Bitvavo({
-                  'APIKEY': self.api_key,
-                  'APISECRET': self.api_secret
-                })
-              self.bitvavo_socket = self.bitvavo_engine.newWebsocket()
-              self.bitvavo_socket.setErrorCallback(self.error_callback)
-      
-          # Handle errors   
-          def error_callback(self, error):
-              print("Errors:", json.dumps(error, indent=2))
-      
-          # Retrieve the data you need from Bitvavo in order to implement your
-          # trading logic. Use multiple workflows to return data to your
-          # callbacks     
-          def a_workflow(self):   
-              self.bitvavo_socket.time(self.a_workflow_callback)
-              self.bitvavo_socket.markets({}, self.a_workflow_callback)
-   
-          # In your app you analyse data returned by the workflow, then make
-          # calls to Bitvavo to respond to market conditions  
-          def a_workflow_callback(self, response):  
-              print("workflow:", json.dumps(response, indent=2))
-      
-          # Sockets are fast, but asynchronous. Keep the socket open while you are 
-          # trading.      
-          def wait_and_close(self):
-              limit = self.bitvavo_engine.getRemainingLimit()
-              try:
-                  while (limit > 0):
-                      time.sleep(0.5)
-                      limit = self.bitvavo_engine.getRemainingLimit()
-              except KeyboardInterrupt:
-                  self.bitvavo_socket.closeSocket()
-      
-      # Shall I re-explain main? Naaaaaaaaaa.  
-      if __name__ == '__main__':
-          bvavo = bitvavo_implementation()
-          bvavo.a_workflow()
-          bvavo.wait_and_close()
-
+    
+    # Use this class to connect to Bitvavo and make your first calls
+    # Add trading strategies to implement your business logic.
+    class bitvavo_implementation:
+        api_key = "<Replace with your your API key from Bitvavo Dashboard>"
+        api_secret = "<Replace with your API secrete from Bitvavo Dashboard>"
+        bitvavo_engine = None
+        bitvavo_socket = None
+    
+        # Connect securely to Bitvavo, create the websocket and error callbacks
+        def __init__(self):
+            self.bitvavo_engine = Bitvavo({
+                'APIKEY': self.api_key,
+                'APISECRET': self.api_secret
+            })
+            self.bitvavo_socket = self.bitvavo_engine.newWebsocket()
+            self.bitvavo_socket.setErrorCallback(self.error_callback)
+    
+        # Handle errors
+        def error_callback(self, error):
+            print("Errors:", json.dumps(error, indent=2))
+    
+        # Retrieve the data you need from Bitvavo in order to implement your
+        # Trading logic. Use multiple workflows to return data to your
+        # Callbacks
+        def a_trading_strategy(self):
+            self.bitvavo_socket.ticker24h({}, self.a_trading_strategy_callback)
+            # You can also filter the ticker to retrieve specific markets only. 
+    
+        # In your app you analyse data returned by the workflow, then make
+        # calls to Bitvavo to respond to market conditions
+        def a_trading_strategy_callback(self, response):
+            # Iterate through the
+            for market in response:
+                match market["market"]:
+                   case "A market":
+                        print("Check data against your trading strategy. For example, the bid is: ", market["bid"] )
+                        # Implement calculations for your trading logic
+                        # If they are positive, place an order: For example:
+                        # self.bitvavo_socket.placeOrder("A market",
+                        #                               'buy',
+                        #                               'limit',
+                        #                               { 'amount': '1', 'price': '00001' },
+                        #                               self.order_placed_callback)
+                   case "a different market":
+                        print("Implement a different strategy for this market")
+    
+    
+        def order_placed_callback(self, response):
+            print("Order placed:", json.dumps(response, indent=2))
+            # Add your business logic to handle orders
+    
+    
+        # Sockets are fast, but asynchronous. Keep the socket open while you are
+        # trading.
+        def wait_and_close(self):
+            limit = self.bitvavo_engine.getRemainingLimit()
+            try:
+                while (limit > 0):
+                    time.sleep(0.5)
+                    limit = self.bitvavo_engine.getRemainingLimit()
+            except KeyboardInterrupt:
+                self.bitvavo_socket.closeSocket()
+    
+    
+    # Shall I re-explain main? Naaaaaaaaaa.
+    if __name__ == '__main__':
+        bvavo = bitvavo_implementation()
+        bvavo.a_trading_strategy()
+        bvavo.wait_and_close()
     ```
 1. **Add security information**
 
     Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api).
+    
+    You must supply your security information to trade on Bitvavo and see your account details. You can retrieve public information such as available markets, assets and current market without 
+    supplying your key and secret. However, Bitvavo returns an error. 
 
 1. **Run your app**
 
     - Command line warriors: `python3 <filename>`.
     - IDE heroes: press the big green button.
  
-Your app connects to Bitvavo and returns a list of the current market prices. 
+Your app connects to Bitvavo and returns a list the latest trade price for each market. The callback cycles through the 
+market data so you can implement your trading logic. 
 
 # Python Bitvavo Api
 This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)

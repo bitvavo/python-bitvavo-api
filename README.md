@@ -4,7 +4,7 @@
 		<td>
 			<table cellspacing="3" border="0">
 				<tr>
-					<td><a href="https://bitvavo.com"><img src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></td>
+					<td><a href="https://bitvavo.com"><img alt="Bitvavo" src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></a></td>
 					<td><h1>Bitvavo SDK for Python</h1></td>
 				</tr>
 			</table>
@@ -12,12 +12,12 @@
 	</tr>
 </table>
 
-Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your own app. 
+Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app. 
 
 To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/).
 
 - [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python.
-- [Get started](#get-started) - rapidy create an app and start trading with Bitvavo. 
+- [Get started](#get-started) - rapidly create an app and start trading with Bitvavo. 
 - [API reference](#api-reference) - in-depth information about Bitvavo SDK for Python
 
 This page shows you how to use Bitvavo SDK for Python with websockets. For REST, see [Readme-rest](./README-REST.md).
@@ -28,7 +28,7 @@ To start programming with Bitvavo SDK for Python you need:
 
 - [Python3](https://www.python.org/downloads/) installed on your development environment
 
-   If you are working on MacOS, ensure that that you have installed SSH certificates:
+   If you are working on macOS, ensure that you have installed SSH certificates:
    ```terminal
     open /Applications/Python\ 3.12/Install\ Certificates.command
     open /Applications/Python\ 3.12/Update\ Shell\ Profile.command
@@ -41,11 +41,11 @@ To start programming with Bitvavo SDK for Python you need:
   - **Trade**: place, update, view and cancel orders.
   - **Withdraw**: withdraw funds.
 
-       Best practice is to not grant his privilage, withdrawals using the API do not require 2FA and e-mail confirmation.
+       Best practice is to not grant his privilege, withdrawals using the API do not require 2FA and e-mail confirmation.
 
 ## Get started
 
-Want to quickly make a first app? Here we go: 
+Want to quickly make a trading app? Here you go: 
 
 1. **Install Bitvavo SDK for Python**  
 
@@ -58,13 +58,13 @@ Want to quickly make a first app? Here we go:
     Add the following code to a new file in your app:
 
     ```python
-    # Import Bitvavo SDK for Python
+    # Import Bitvavo SDK for Python.
     from python_bitvavo_api.bitvavo import Bitvavo
     import json
     import time
     
     
-    # Use this class to connect to Bitvavo and make your first calls
+    # Use this class to connect to Bitvavo and make your first calls.
     # Add trading strategies to implement your business logic.
     class bitvavo_implementation:
         api_key = "<Replace with your your API key from Bitvavo Dashboard>"
@@ -72,7 +72,7 @@ Want to quickly make a first app? Here we go:
         bitvavo_engine = None
         bitvavo_socket = None
     
-        # Connect securely to Bitvavo, create the websocket and error callbacks
+        # Connect securely to Bitvavo, create the websocket and error callbacks.
         def __init__(self):
             self.bitvavo_engine = Bitvavo({
                 'APIKEY': self.api_key,
@@ -81,26 +81,27 @@ Want to quickly make a first app? Here we go:
             self.bitvavo_socket = self.bitvavo_engine.newWebsocket()
             self.bitvavo_socket.setErrorCallback(self.error_callback)
     
-        # Handle errors
+        # Handle errors.
         def error_callback(self, error):
             print("Errors:", json.dumps(error, indent=2))
     
         # Retrieve the data you need from Bitvavo in order to implement your
-        # Trading logic. Use multiple workflows to return data to your
-        # Callbacks
+        # trading logic. Use multiple workflows to return data to your
+        # callbacks.
         def a_trading_strategy(self):
             self.bitvavo_socket.ticker24h({}, self.a_trading_strategy_callback)
-            # You can also filter the ticker to retrieve specific markets only. 
     
-        # In your app you analyse data returned by the workflow, then make
-        # calls to Bitvavo to respond to market conditions
+        # In your app you analyse data returned by the trading strategy, then make
+        # calls to Bitvavo to respond to market conditions.
         def a_trading_strategy_callback(self, response):
+            print("All the latest trades:", json.dumps(response, indent=2))
             # Iterate through the
             for market in response:
+                print("Iterate through markets:", market["market"] )
                 match market["market"]:
                    case "A market":
                         print("Check data against your trading strategy. For example, the bid is: ", market["bid"] )
-                        # Implement calculations for your trading logic
+                        # Implement calculations for your trading logic.
                         # If they are positive, place an order: For example:
                         # self.bitvavo_socket.placeOrder("A market",
                         #                               'buy',
@@ -108,17 +109,22 @@ Want to quickly make a first app? Here we go:
                         #                               { 'amount': '1', 'price': '00001' },
                         #                               self.order_placed_callback)
                    case "a different market":
-                        print("Implement a different strategy for this market")
+                        print("do something else")
     
     
         def order_placed_callback(self, response):
+            # The order return parameters explain the quote and the fees for this trade.
             print("Order placed:", json.dumps(response, indent=2))
-            # Add your business logic to handle orders
+            # Add your business logic.
     
     
         # Sockets are fast, but asynchronous. Keep the socket open while you are
         # trading.
         def wait_and_close(self):
+            # Bitvavo uses a weight based rate limiting system. Your app is limited to 1000 weight points per IP or
+            # API key per minute. The rate weighting for each endpoint is supplied in the Bitvavo API documentation.
+            # This call returns the amount of points left. If you make more requests than permitted by the weight limit,
+            # your IP or API key is banned.
             limit = self.bitvavo_engine.getRemainingLimit()
             try:
                 while (limit > 0):
@@ -133,7 +139,9 @@ Want to quickly make a first app? Here we go:
         bvavo = bitvavo_implementation()
         bvavo.a_trading_strategy()
         bvavo.wait_and_close()
+
     ```
+   
 1. **Add security information**
 
     Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api).
@@ -146,8 +154,8 @@ Want to quickly make a first app? Here we go:
     - Command line warriors: `python3 <filename>`.
     - IDE heroes: press the big green button.
  
-Your app connects to Bitvavo and returns a list the latest trade price for each market. The callback cycles through the 
-market data so you can implement your trading logic. 
+Your app connects to Bitvavo and returns a list the latest trade price for each market. You use this data to implement
+your trading logic.
 
 ## API reference
 
@@ -208,8 +216,9 @@ The rate weighting for each endpoint is supplied in the [Bitvavo API documentati
 
 #### REST requests
 
-For all functions, required parameters are passed as separate values, optional parameters are passed as a dictionary; 
-return parameters are in dictionary format such that `response['<key>'] = '<value>'`.  Only when [placing orders](#place-order) some of the optional parameters are required, since a limit order requires more information than a market order. 
+For all functions, required parameters are passed as separate values, optional parameters are passed as a dictionary. 
+Return parameters are in dictionary format: `response['<key>'] = '<value>'`. However, as a limit order requires 
+more information than a market order, some optional parameters are required when you [place an order](#place-order).
 
 #### Get time
 ```python
@@ -697,7 +706,7 @@ websocket.ticker24h({}, timeCallback)
 ```
 </details>
 
-### Private
+### Private trading data
 
 #### Place order
 When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote has been set.
@@ -739,7 +748,8 @@ websocket.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000'
 </details>
 
 #### Update order
-When updating an order make sure that at least one of the optional parameters has been set. Otherwise nothing can be updated.
+
+When updating an order make sure that at least one of the optional parameters has been set, otherwise nothing can be updated.
 ```python
 # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
 #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
@@ -923,7 +933,7 @@ websocket.cancelOrders({}, ownCallback)
     "orderId": "4f9a809b-859f-4d8d-97b3-037113cdf2d0"
   }, 
   {
-    "orderId": "95313ae5-ad65-4430-a0fb-63591bbc337c".
+    "orderId": "95313ae5-ad65-4430-a0fb-63591bbc337c"
   }, 
   {
     "orderId": "2465c3ab-5ae2-4d4d-bec7-345f51b3494d"

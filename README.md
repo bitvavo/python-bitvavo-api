@@ -165,7 +165,7 @@ For information on the specifics of every parameter, see the [Bitvavo API refere
 
 * [About the API](#about-the-api)
   * [Rate limit](#rate-limit)
-  * [REST requests](#requests)
+  * [Requests](#requests)
 * [Public endpoints](#public-endpoints) 
   * [Synchronization endpoints](#general-endpoints)
     * [Time](#get-time)

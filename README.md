@@ -1,26 +1,22 @@
 
-<table cellspacing="0" cellpadding="0" border="0" >
-	<tr>
-		<td>
-			<table cellspacing="3" border="0">
-				<tr>
-					<td><a href="https://bitvavo.com"><img alt="Bitvavo" src="./assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></a></td>
-					<td><h1>Bitvavo SDK for Python</h1></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+<table cellspacing="3" border="0">
+ <tr>
+  <td><a href="https://bitvavo.com"><img alt="Bitvavo" src="docs/assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></a></td>
+  <td><h1>Bitvavo SDK for Python</h1></td>
+ </tr>
 </table>
 
-Crypto starts with Bitvavo. You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app. 
+Crypto starts with Bitvavo. 
+You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app. 
 
 To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/).
 
-- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python.
-- [Get started](#get-started) - rapidly create an app and start trading with Bitvavo. 
+- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python
+- [Get started](#get-started) - rapidly create an app and start trading with Bitvavo
 - [API reference](#api-reference) - in-depth information about Bitvavo SDK for Python
 
-This page shows you how to use Bitvavo SDK for Python with websockets. For REST, see [Readme-rest](./README-REST.md).
+This page shows you how to use Bitvavo SDK for Python with WebSockets. 
+For REST, see the [REST readme](docs/rest.md).
 
 ## Prerequisites
 
@@ -36,12 +32,13 @@ To start programming with Bitvavo SDK for Python you need:
 - A Python app. Use your favorite IDE, or run from the command line
 - An [API key and secret](https://support.bitvavo.com/hc/en-us/articles/4405059841809) associated with your Bitvavo account
 
-  You control the actions your app can do using the rights you assign to the API key. Possible rights are:
-  - **View**: retrieve information about your balance, account, deposit and withdrawals.
-  - **Trade**: place, update, view and cancel orders.
-  - **Withdraw**: withdraw funds.
+  You control the actions your app can do using the rights you assign to the API key. 
+  Possible rights are:
+  - **View**: retrieve information about your balance, account, deposit and withdrawals
+  - **Trade**: place, update, view and cancel orders
+  - **Withdraw**: withdraw funds
 
-       Best practice is to not grant his privilege, withdrawals using the API do not require 2FA and e-mail confirmation.
+       Best practice is to not grant this privilege, withdrawals using the API do not require 2FA and e-mail confirmation.
 
 ## Get started
 
@@ -68,11 +65,11 @@ Want to quickly make a trading app? Here you go:
     # Add trading strategies to implement your business logic.
     class bitvavo_implementation:
         api_key = "<Replace with your your API key from Bitvavo Dashboard>"
-        api_secret = "<Replace with your API secrete from Bitvavo Dashboard>"
+        api_secret = "<Replace with your API secret from Bitvavo Dashboard>"
         bitvavo_engine = None
         bitvavo_socket = None
     
-        # Connect securely to Bitvavo, create the websocket and error callbacks.
+        # Connect securely to Bitvavo, create the WebSocket and error callbacks.
         def __init__(self):
             self.bitvavo_engine = Bitvavo({
                 'APIKEY': self.api_key,
@@ -122,7 +119,7 @@ Want to quickly make a trading app? Here you go:
         # trading.
         def wait_and_close(self):
             # Bitvavo uses a weight based rate limiting system. Your app is limited to 1000 weight points per IP or
-            # API key per minute. The rate weighting for each endpoint is supplied in the Bitvavo API documentation.
+            # API key per minute. The rate weighting for each endpoint is supplied in Bitvavo API documentation.
             # This call returns the amount of points left. If you make more requests than permitted by the weight limit,
             # your IP or API key is banned.
             limit = self.bitvavo_engine.getRemainingLimit()
@@ -144,68 +141,80 @@ Want to quickly make a trading app? Here you go:
    
 1. **Add security information**
 
-    Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api).
-    
-    You must supply your security information to trade on Bitvavo and see your account details. You can retrieve public information such as available markets, assets and current market without 
-    supplying your key and secret. However, Bitvavo returns an error. 
+    You must supply your security information to trade on Bitvavo and see your account information using the authenticate methods. Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api). 
+
+    You can retrieve public information such as available markets, assets and current market without supplying your key and secret. 
+    However, Bitvavo returns an error.
 
 1. **Run your app**
 
     - Command line warriors: `python3 <filename>`.
     - IDE heroes: press the big green button.
  
-Your app connects to Bitvavo and returns a list the latest trade price for each market. You use this data to implement
-your trading logic.
+Your app connects to Bitvavo and returns a list the latest trade price for each market. 
+You use this data to implement your trading logic.
 
 ## API reference
 
-This is the python wrapper for the Bitvavo API. This project can be used to build your own projects which interact with the Bitvavo platform. Every function available on the API can be called through a REST request or over websockets. For info on the specifics of every parameter consult the [Bitvavo API documentation](https://docs.bitvavo.com/)
+Bitvavo SDK for Python is a Python wrapper for Bitvavo API.
+You use this SDK to interact with Bitvavo from your own app. 
+You must set your API key and secret for authenticated endpoints, public endpoints do not require authentication. 
+You can call every method in this SDK over WebSockets, or as REST requests. 
 
-* [General](#general)
-  * [Rate limiting](#rate-limiting)
-  * [REST requests](#rest-requests) 
-  * [Time](#get-time)
-  * [Markets](#get-markets)
-  * [Assets](#get-assets)
-* [Public market data](#public-market-data)
-  * [Book](#get-book-per-market)
-  * [Public Trades](#get-trades-per-market)
-  * [Candles](#get-candles-per-market)
-  * [Price Ticker](#get-price-ticker)
-  * [Book Ticker](#get-book-ticker)
-  * [24 Hour Ticker](#get-24-hour-ticker)
-* [Private trading data](#private-trading-data)
-  * [Place Order](#place-order)
-  * [Update Order](#update-order)
-  * [Get Order](#get-order)
-  * [Cancel Order](#cancel-order)
-  * [Get Orders](#get-orders)
-  * [Cancel Orders](#cancel-orders)
-  * [Orders Open](#get-orders-open)
-  * [Trades](#get-trades)
-  * [Account](#get-account)
-  * [Balance](#get-balance)
-  * [Deposit](#deposit-assets)
-  * [Withdraw](#withdraw-assets)
-  * [Deposit History](#get-deposit-history)
-  * [Withdrawal History](#get-withdrawal-history)
-* [Subscriptions](#subscriptions)
-  * [Ticker Subscription](#ticker-subscription)
-  * [Ticker 24 Hour Subscription](#ticker-24-hour-subscription)
-  * [Account Subscription](#account-subscription)
-  * [Candles Subscription](#candles-subscription)
-  * [Trades Subscription](#trades-subscription)
-  * [Book Subscription](#book-subscription)
-  * [Book subscription with local copy](#book-subscription-with-local-copy)
+For information on the specifics of every parameter, see the [Bitvavo API reference](https://docs.bitvavo.com/).
 
-### General
+* [About the API](#about-the-api)
+  * [Rate limit](#rate-limit)
+  * [REST requests](#requests)
+* [Public endpoints](#public-endpoints) 
+  * [Synchronization endpoints](#general-endpoints)
+    * [Time](#get-time)
+  * [Market data endpoints](#market-data-endpoints)
+    * [Markets](#get-markets)
+    * [Assets](#get-assets)
+    * [Book](#get-book-per-market)
+    * [Public Trades](#get-trades-per-market)
+    * [Candles](#get-candles-per-market)
+    * [Price Ticker](#get-price-ticker)
+    * [Book Ticker](#get-book-ticker)
+    * [24 Hour Ticker](#get-24-hour-ticker)
+* [Authenticated endpoints](#authenticated-endpoints)
+  * [Trading endpoints](#trading-endpoints)
+    * [Place Order](#place-order)
+    * [Update Order](#update-order)
+    * [Get Order](#get-order)
+    * [Cancel Order](#cancel-order)
+    * [Get Orders](#get-orders)
+    * [Cancel Orders](#cancel-orders)
+    * [Orders Open](#get-orders-open)
+    * [Trades](#get-trades)
+  * [Account endpoints](#account-endpoints)
+    * [Account](#get-account)
+    * [Balance](#get-balance)
+    * [Deposit](#deposit-assets)
+    * [Withdraw](#withdraw-assets)
+    * [Deposit History](#get-deposit-history)
+    * [Withdrawal History](#get-withdrawal-history)
+  * [Subscriptions](#subscriptions)
+    * [Ticker Subscription](#ticker-subscription)
+    * [Ticker 24 Hour Subscription](#ticker-24-hour-subscription)
+    * [Account Subscription](#account-subscription)
+    * [Candles Subscription](#candles-subscription)
+    * [Trades Subscription](#trades-subscription)
+    * [Book Subscription](#book-subscription)
+    * [Book subscription with local copy](#book-subscription-with-local-copy)
 
-#### Rate limiting
+### About the API
 
-Bitvavo uses a weight based rate limiting system. Your app is limited to 1000 weight points per IP or API key per 
-minute. When you make a call to Bitvavo API, your remaining weight points are returned in the header of each REST request. 
+This section explains global concepts about how this SDK works. 
 
-Websocket functions do not return your returning weight points, you track your remaining weight points with a call to:
+#### Rate limit
+
+Bitvavo uses a weight based rate limiting system. 
+Your app is limited to 1000 weight points per IP or API key per minute. 
+When you make a call to Bitvavo API, your remaining weight points are returned in the header of each REST request. 
+
+Websocket methods do not return your returning weight points, you track your remaining weight points with a call to:
 ```
 limit = bitvavo.getRemainingLimit()
 ```
@@ -214,13 +223,21 @@ If you make more requests than permitted by the weight limit, your IP or API key
 
 The rate weighting for each endpoint is supplied in the [Bitvavo API documentation](https://docs.bitvavo.com/).
 
-#### REST requests
+#### Requests
 
-For all functions, required parameters are passed as separate values, optional parameters are passed as a dictionary. 
+For all methods, required parameters are passed as separate values, optional parameters are passed as a dictionary. 
 Return parameters are in dictionary format: `response['<key>'] = '<value>'`. However, as a limit order requires 
 more information than a market order, some optional parameters are required when you [place an order](#place-order).
 
-#### Get time
+### Public endpoints
+
+You do not have set your API key and secret to retrieve data using the following methods.  
+
+#### Synchronization endpoints
+
+You use these methods to synchronize between your app and bitvavo. 
+
+##### Get time
 ```python
 response = bitvavo.time()
 print(response)
@@ -235,23 +252,11 @@ print(response)
 ```
 </details>
 
-### Public market data
+#### Market data endpoints
 
-#### Get time
-```python
-websocket.time(ownCallback)
-```
-<details>
- <summary>View Response</summary>
+Public data about the markets in Bitvavo.
 
-```python
-{
-  "time": 1543397021396
-}
-```
-</details>
-
-#### Get markets
+##### Get markets
 ```python
 # options: market
 websocket.markets({}, ownCallback)
@@ -391,7 +396,7 @@ websocket.assets({}, ownCallback)
 ```
 </details>
 
-#### Get book per market
+##### Get book per market
 ```python
 # options: depth
 websocket.book('BTC-EUR', {}, ownCallback)
@@ -461,7 +466,7 @@ websocket.book('BTC-EUR', {}, ownCallback)
 ```
 </details>
 
-#### Get trades per market
+##### Get trades per market
 ```python
 # options: limit, start, end, tradeIdFrom, tradeIdTo
 websocket.publicTrades('BTC-EUR', {}, ownCallback)
@@ -504,7 +509,7 @@ websocket.publicTrades('BTC-EUR', {}, ownCallback)
 ```
 </details>
 
-#### Get candles per market
+##### Get candles per market
 ```python
 # options: limit
 websocket.candles('BTC-EUR', '1h', {}, ownCallback)
@@ -559,7 +564,7 @@ websocket.candles('BTC-EUR', '1h', {}, ownCallback)
 ```
 </details>
 
-#### Get price ticker
+##### Get price ticker
 ```python
 # options: market
 websocket.tickerPrice({}, ownCallback)
@@ -606,7 +611,7 @@ websocket.tickerPrice({}, ownCallback)
 ```
 </details>
 
-#### Get book ticker
+##### Get book ticker
 ```python
 # options: market
 websocket.tickerBook({}, ownCallback)
@@ -649,7 +654,7 @@ websocket.tickerBook({}, ownCallback)
 ```
 </details>
 
-#### Get 24 hour ticker
+##### Get 24 hour ticker
 ```python
 # options: market
 websocket.ticker24h({}, timeCallback)
@@ -706,9 +711,15 @@ websocket.ticker24h({}, timeCallback)
 ```
 </details>
 
-### Private trading data
+### Authenticated endpoints
 
-#### Place order
+To interact with Bitvavo using these endpoints, you must set your API key and secret. 
+
+#### Trading endpoints
+
+Place, update, cancel, retrieve and trace orders.  
+
+##### Place order
 When placing an order, make sure that the correct optional parameters are set. For a limit order it is required to set both the amount and price. A market order is valid if either amount or amountQuote has been set.
 ```python
 # optional parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection),
@@ -747,7 +758,7 @@ websocket.placeOrder('BTC-EUR', 'buy', 'limit', { 'amount': '1', 'price': '3000'
 ```
 </details>
 
-#### Update order
+##### Update order
 
 When updating an order make sure that at least one of the optional parameters has been set, otherwise nothing can be updated.
 ```python
@@ -786,7 +797,7 @@ websocket.updateOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', { 'amou
 ```
 </details>
 
-#### Get order
+##### Get order
 ```python
 websocket.getOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', ownCallback)
 ```
@@ -820,7 +831,7 @@ websocket.getOrder('BTC-EUR', '5444f908-67c4-4c5d-a138-7e834b94360e', ownCallbac
 ```
 </details>
 
-#### Cancel order
+##### Cancel order
 ```python
 websocket.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626', ownCallback)
 ```
@@ -834,7 +845,7 @@ websocket.cancelOrder('BTC-EUR', '5986db7b-8d6e-4577-8003-22f363fb3626', ownCall
 ```
 </details>
 
-#### Get orders
+##### Get orders
 Returns the same as get order, but can be used to return multiple orders at once.
 ```python
 # options: limit, start, end, orderIdFrom, orderIdTo
@@ -918,7 +929,7 @@ websocket.getOrders('BTC-EUR', {}, ownCallback)
 ```
 </details>
 
-#### Cancel orders
+##### Cancel orders
 Cancels all orders in a market. If no market is specified, all orders of an account will be canceled.
 ```python
 # options: market
@@ -943,7 +954,7 @@ websocket.cancelOrders({}, ownCallback)
 ```
 </details>
 
-#### Get orders open
+##### Get orders open
 Returns all orders which are not filled or canceled.
 ```python
 # options: market
@@ -1016,7 +1027,7 @@ websocket.ordersOpen({}, ownCallback)
 ```
 </details>
 
-#### Get trades
+##### Get trades
 Returns all trades within a market for this account.
 ```python
 # options: limit, start, end, tradeIdFrom, tradeIdTo
@@ -1068,7 +1079,11 @@ websocket.trades('BTC-EUR', {}, ownCallback)
 ```
 </details>
 
-#### Get account
+#### Account endpoints
+
+View and update your account details; deposit and withdraw funds in your account.   
+
+##### Get account
 Returns the fee tier for this account.
 ```python
 websocket.account(ownCallback)
@@ -1087,7 +1102,9 @@ websocket.account(ownCallback)
 ```
 </details>
 
-#### Get balance
+### Account endpoints
+
+##### Get balance
 Returns the balance for this account.
 ```python
 # options: symbol
@@ -1128,7 +1145,7 @@ websocket.balance({}, ownCallback)
 ```
 </details>
 
-#### Deposit assets
+##### Deposit assets
 Returns the address which can be used to deposit funds.
 ```python
 websocket.depositAssets('BTC', ownCallback)
@@ -1143,7 +1160,7 @@ websocket.depositAssets('BTC', ownCallback)
 ```
 </details>
 
-#### Withdraw assets
+##### Withdraw assets
 Can be used to withdraw funds from Bitvavo.
 ```python
 # optional parameters: paymentId, internal, addWithdrawalFee
@@ -1161,7 +1178,7 @@ websocket.withdrawAssets('BTC', '1', 'BitcoinAddress', {}, ownCallback)
 ```
 </details>
 
-#### Get deposit history
+##### Get deposit history
 Returns the deposit history of your account.
 ```python
 # options: symbol, limit, start, end
@@ -1193,7 +1210,7 @@ websocket.depositHistory({}, ownCallback)
 ```
 </details>
 
-#### Get withdrawal history
+##### Get withdrawal history
 Returns the withdrawal history of an account.
 ```python
 # options: symbol, limit, start, end
@@ -1235,6 +1252,8 @@ websocket.withdrawalHistory({}, ownCallback)
 </details>
 
 ### Subscriptions
+
+Bitvavo services that supply the latest data. 
 
 #### Ticker subscription
 Sends an update every time the best bid, best ask or last price changed.
@@ -1377,7 +1396,7 @@ websocket.subscriptionTrades('BTC-EUR', ownCallback)
 </details>
 
 #### Book subscription
-Sends an update whenever the order book for this specific market has changed. A list of tuples ([price, amount]) are returned, where amount ‘0’ means that there are no more orders at this price. If you wish to maintain your own copy of the order book, consider using the next function.
+Sends an update whenever the order book for this specific market has changed. A list of tuples ([price, amount]) are returned, where amount ‘0’ means that there are no more orders at this price. If you wish to maintain your own copy of the order book, consider using the next methods.
 ```python
 websocket.subscriptionBookUpdate('BTC-EUR', ownCallback)
 ```

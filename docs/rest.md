@@ -6,8 +6,8 @@ You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets o
 
 To trade and execute your advanced trading strategies, Bitvavo SDK for Python is a wrapper that enables you to easily call every endpoint in [Bitvavo API](https://docs.bitvavo.com/).
 
-- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python. 
-- [API reference](#api-reference) - in-depth information about Bitvavo SDK for Python
+- [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python
+- [API reference](https://docs.bitvavo.com/) - information on the specifics of every parameter
 
 This page gives reference information for REST calls made using Bitvavo SDK for Python.
 

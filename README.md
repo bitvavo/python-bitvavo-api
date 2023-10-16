@@ -14,7 +14,7 @@ To trade and execute your advanced trading strategies, Bitvavo SDK for Python is
 - [Prerequisites](#prerequisites) - what you need to start developing with Bitvavo SDK for Python
 - [Get started](#get-started) - rapidly create an app and start trading with Bitvavo
 - [About the SDK](#about-the-sdk) - general information about Bitvavo SDK for Python
-- API reference - for information on the specifics of every parameter, see the [Bitvavo API](https://docs.bitvavo.com/)
+- [API reference](https://docs.bitvavo.com/) - information on the specifics of every parameter
 
 This page shows you how to use Bitvavo SDK for Python with WebSockets. 
 For REST, see the [REST readme](docs/rest.md).

@@ -62,7 +62,7 @@ Want to quickly make a trading app? Here you go:
     
     # Use this class to connect to Bitvavo and make your first calls.
     # Add trading strategies to implement your business logic.
-    class bitvavo_implementation:
+    class BitvavoImplementation:
         api_key = "<Replace with your your API key from Bitvavo Dashboard>"
         api_secret = "<Replace with your API secret from Bitvavo Dashboard>"
         bitvavo_engine = None
@@ -95,11 +95,11 @@ Want to quickly make a trading app? Here you go:
             for market in response:
                 print("Iterate through markets:", market["market"] )
                 match market["market"]:
-                   case "A market":
+                   case "ABC-EUR":
                         print("Check data against your trading strategy. For example, the bid is: ", market["bid"] )
                         # Implement calculations for your trading logic.
                         # If they are positive, place an order: For example:
-                        # self.bitvavo_socket.placeOrder("A market",
+                        # self.bitvavo_socket.placeOrder("ABC-EUR",
                         #                               'buy',
                         #                               'limit',
                         #                               { 'amount': '1', 'price': '00001' },
@@ -132,7 +132,7 @@ Want to quickly make a trading app? Here you go:
     
     # Shall I re-explain main? Naaaaaaaaaa.
     if __name__ == '__main__':
-        bvavo = bitvavo_implementation()
+        bvavo = BitvavoImplementation()
         bvavo.a_trading_strategy()
         bvavo.wait_and_close()
     ```

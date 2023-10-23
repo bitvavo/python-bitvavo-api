@@ -1,10 +1,5 @@
 
-<table>
-  <tr>
-    <td><a href="https://bitvavo.com"><img alt="Bitvavo" src="docs/assets/bitvavo-mark-square-blue.svg" width="100" title="Bitvavo Logo"></a></td>
-    <td><h1>Bitvavo SDK for Python</h1></td>
-  </tr>
-</table>
+# Bitvavo SDK for Python
 
 Crypto starts with Bitvavo. 
 You use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app. 

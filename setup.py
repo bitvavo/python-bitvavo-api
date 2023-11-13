@@ -10,14 +10,15 @@ setup(
     name="python_bitvavo_api",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version="0.0.4",
+    version="1.2.3",
     author="Bitvavo",
     description="Use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app.",
     url="https://github.com/bitvavo/python-bitvavo-api",
     packages=find_packages(),
     install_requires=[
-        'websocket-client==0.57.0',
-        'requests'
+        'websocket-client',
+        'requests==2.31.0',
+        'setuptools'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

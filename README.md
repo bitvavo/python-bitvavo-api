@@ -46,12 +46,16 @@ Want to quickly make a trading app? Here you go:
     ```terminal
     python -m pip install python_bitvavo_api
     ```
+
+    If you installed from `test.pypi.com`, update the requests library: `pip install --upgrade  requests`.   
+
+
 1. **Create a simple Bitvavo implementation**
 
     Add the following code to a new file in your app:
 
     ```python
-    from python_bitvavo_api.bitvavo import Bitvavo
+    from python_bitvavo_api.bitvavo import Bitvavo        
     import json
     import time
     
@@ -74,7 +78,8 @@ Want to quickly make a trading app? Here you go:
     
         # Handle errors.
         def error_callback(self, error):
-            print("Errors:", json.dumps(error, indent=2))
+            print("Add your error message.")
+            #print("Errors:", json.dumps(error, indent=2))
     
         # Retrieve the data you need from Bitvavo in order to implement your
         # trading logic. Use multiple workflows to return data to your
@@ -85,22 +90,24 @@ Want to quickly make a trading app? Here you go:
         # In your app you analyse data returned by the trading strategy, then make
         # calls to Bitvavo to respond to market conditions.
         def a_trading_strategy_callback(self, response):
-            print("All the latest trades:", json.dumps(response, indent=2))
-            # Iterate through the
+            # Iterate through the markets
             for market in response:
-                print("Iterate through markets:", market["market"] )
+    
                 match market["market"]:
-                   case "ABC-EUR":
-                        print("Check data against your trading strategy. For example, the bid is: ", market["bid"] )
+                   case "ZRX-EUR":
+                        print("Eureka, the latest bid for ZRX-EUR is: ", market["bid"] )
                         # Implement calculations for your trading logic.
                         # If they are positive, place an order: For example:
-                        # self.bitvavo_socket.placeOrder("ABC-EUR",
+                        # self.bitvavo_socket.placeOrder("ZRX-EUR",
                         #                               'buy',
                         #                               'limit',
                         #                               { 'amount': '1', 'price': '00001' },
                         #                               self.order_placed_callback)
                    case "a different market":
                         print("do something else")
+                   case _:
+                        print("Not this one: ", market["market"])
+    
     
     
         def order_placed_callback(self, response):
@@ -123,8 +130,8 @@ Want to quickly make a trading app? Here you go:
                     limit = self.bitvavo_engine.getRemainingLimit()
             except KeyboardInterrupt:
                 self.bitvavo_socket.closeSocket()
-    
-    
+
+
     # Shall I re-explain main? Naaaaaaaaaa.
     if __name__ == '__main__':
         bvavo = BitvavoImplementation()
@@ -138,7 +145,8 @@ Want to quickly make a trading app? Here you go:
     Replace the values of  `api_key` and `api_secret` with your credentials from [Bitvavo Dashboard](https://account.bitvavo.com/user/api). 
 
     You can retrieve public information such as available markets, assets and current market without supplying your key and secret. 
-    However, Bitvavo returns an error.
+    However, unauthenticated calls have lower rate limits based on your IP address, and your account is blocked for longer if 
+    you exceed your limit.
 
 1. **Run your app**
 

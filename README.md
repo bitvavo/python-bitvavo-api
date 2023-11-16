@@ -55,7 +55,7 @@ Want to quickly make a trading app? Here you go:
     Add the following code to a new file in your app:
 
     ```python
-    from python_bitvavo_api.bitvavo import Bitvavo        
+    from python_bitvavo_api.bitvavo import Bitvavo
     import json
     import time
     

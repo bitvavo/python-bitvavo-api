@@ -36,6 +36,9 @@ def createPostfix(options):
 def _default(value, fallback):
   return value if value is not None else fallback
 
+def _epoch_millis(dt):
+  return int(dt.timestamp() * 1000)
+
 def asksCompare(a, b):
   if(a < b):
     return True
@@ -249,9 +252,15 @@ class Bitvavo:
     return self.publicRequest((self.base + '/' + symbol + '/trades' + postfix))
 
   # options: limit, start, end
-  def candles(self, symbol, interval, options=None):
+  def candles(self, symbol, interval, options=None, limit=None, start=None, end=None):
     options = _default(options, {})
     options['interval'] = interval
+    if limit is not None:
+      options['limit'] = limit
+    if start is not None:
+      options['start'] = _epoch_millis(start)
+    if end is not None:
+      options['end'] = _epoch_millis(end)
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/candles' + postfix))
 

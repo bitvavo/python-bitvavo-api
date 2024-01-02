@@ -24,6 +24,7 @@ def createSignature(timestamp, method, url, body, APISECRET):
   return signature
 
 def createPostfix(options):
+  options = _default(options, {})
   params = []
   for key in options:
     params.append(key + '=' + str(options[key]))
@@ -31,6 +32,9 @@ def createPostfix(options):
   if(len(options) > 0):
     postfix = '?' + postfix
   return postfix
+
+def _default(value, fallback):
+  return value if value is not None else fallback
 
 def asksCompare(a, b):
   if(a < b):
@@ -225,43 +229,44 @@ class Bitvavo:
     return self.publicRequest((self.base + '/time'))
 
   # options: market
-  def markets(self, options):
+  def markets(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/markets' + postfix))
 
   # options: symbol
-  def assets(self, options):
+  def assets(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/assets' + postfix))
 
   # options: depth
-  def book(self, symbol, options):
+  def book(self, symbol, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/book' + postfix))
 
   # options: limit, start, end, tradeIdFrom, tradeIdTo
-  def publicTrades(self, symbol, options):
+  def publicTrades(self, symbol, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/trades' + postfix))
 
   # options: limit, start, end
-  def candles(self, symbol, interval, options):
+  def candles(self, symbol, interval, options=None):
+    options = _default(options, {})
     options['interval'] = interval
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/candles' + postfix))
 
   # options: market
-  def tickerPrice(self, options):
+  def tickerPrice(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/price' + postfix))
 
   # options: market
-  def tickerBook(self, options):
+  def tickerBook(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/book' + postfix))
 
   # options: market
-  def ticker24h(self, options):
+  def ticker24h(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/24h' + postfix))
 
@@ -292,23 +297,25 @@ class Bitvavo:
     return self.privateRequest('/order', postfix, {}, 'DELETE')
 
   # options: limit, start, end, orderIdFrom, orderIdTo
-  def getOrders(self, market, options):
+  def getOrders(self, market, options=None):
+    options = _default(options, {})
     options['market'] = market
     postfix = createPostfix(options)
     return self.privateRequest('/orders', postfix, {}, 'GET')
 
   # options: market
-  def cancelOrders(self, options):
+  def cancelOrders(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/orders', postfix, {}, 'DELETE')
 
   # options: market
-  def ordersOpen(self, options):
+  def ordersOpen(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/ordersOpen', postfix, {}, 'GET')
 
   # options: limit, start, end, tradeIdFrom, tradeIdTo
-  def trades(self, market, options):
+  def trades(self, market, options=None):
+    options = _default(options, {})
     options['market'] = market
     postfix = createPostfix(options)
     return self.privateRequest('/trades', postfix, {}, 'GET')
@@ -317,7 +324,7 @@ class Bitvavo:
     return self.privateRequest('/account', '', {}, 'GET')
 
   # options: symbol
-  def balance(self, options):
+  def balance(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/balance', postfix, {}, 'GET')
 
@@ -333,12 +340,12 @@ class Bitvavo:
     return self.privateRequest('/withdrawal', '', body, 'POST')
 
   # options: symbol, limit, start, end
-  def depositHistory(self, options):
+  def depositHistory(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/depositHistory', postfix, {}, 'GET')
 
   # options: symbol, limit, start, end
-  def withdrawalHistory(self, options):
+  def withdrawalHistory(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 

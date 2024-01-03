@@ -37,6 +37,11 @@ jobs:
           git commit --message ${{ github.event.inputs.version }} setup.py
           git tag v${{ github.event.inputs.version }}
 
+      - uses: ./.github/actions/python-build-publish
+        with:
+          repository: testpypi
+          token: ${{ secrets.test_pypi_token }}
+
       - name: Push release commit
         run: git push --tags origin ${{ github.ref_name }}
 

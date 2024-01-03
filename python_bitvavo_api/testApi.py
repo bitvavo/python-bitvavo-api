@@ -1,6 +1,5 @@
+from datetime import datetime, timezone
 from python_bitvavo_api.bitvavo import Bitvavo
-import sys
-import signal
 import time
 import json
 
@@ -32,26 +31,28 @@ def testREST(bitvavo):
   response = bitvavo.time()
   print(response)
 
-  # response = bitvavo.markets({})
+  # response = bitvavo.markets()
   # for market in response:
   #   print(json.dumps(market, indent=2))
 
-  # response = bitvavo.assets({})
+  # response = bitvavo.assets()
   # for asset in response:
   #   print(json.dumps(asset, indent=2))
 
-  # response = bitvavo.book('BTC-EUR', {})
+  # response = bitvavo.book('BTC-EUR')
   # print(json.dumps(response, indent=2))
 
-  # response = bitvavo.publicTrades('BTC-EUR', {})
+  # response = bitvavo.publicTrades('BTC-EUR')
   # for trade in response:
   #   print(json.dumps(trade, indent=2))
 
   # Timestamp: candle[0], open: candle[1], high: candle[2], low: candle[3], close: candle[4], volume: candle[5]
-  # response = bitvavo.candles('BTC-EUR', '1h', {})
-  # for candle in response:
-  #   print(json.dumps(candle, indent=2))
-  
+  # candles = bitvavo.candles('BTC-EUR', '15m')
+  # candles = bitvavo.candles('BTC-EUR', '15m', limit=10)
+  # candles = bitvavo.candles('BTC-EUR', '15m', start=datetime(year=2024, month=1, day=1, hour=0, tzinfo=timezone.utc), end=datetime(year=2024, month=1, day=1, hour=1, tzinfo=timezone.utc))
+  # for candle in candles:
+  #   print('Timestamp', candle[0], ' open', candle[1], ' high', candle[2], ' low', candle[3], ' close', candle[4], ' volume', candle[5])
+
   # response = bitvavo.tickerPrice({})
   # print(json.dumps(response, indent=2))
 
@@ -78,7 +79,7 @@ def testREST(bitvavo):
   # response = bitvavo.cancelOrder('BTC-EUR', 'dd055772-0f02-493c-a049-f4356fa0d221')
   # print(json.dumps(response, indent=2))
 
-  # response = bitvavo.getOrders('BTC-EUR', {})
+  # response = bitvavo.getOrders('BTC-EUR')
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
@@ -86,18 +87,18 @@ def testREST(bitvavo):
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
-  # response = bitvavo.ordersOpen({})
+  # response = bitvavo.ordersOpen()
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
-  # response = bitvavo.trades('BTC-EUR', {})
+  # response = bitvavo.trades('BTC-EUR')
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
   # response = bitvavo.account()
   # print(json.dumps(response, indent=2))
 
-  # response = bitvavo.balance({})
+  # response = bitvavo.balance()
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
@@ -107,15 +108,15 @@ def testREST(bitvavo):
   # response = bitvavo.withdrawAssets('BTC', '1', 'BitcoinAddress', {})
   # print(json.dumps(response, indent=2))
 
-  # response = bitvavo.depositHistory({})
+  # response = bitvavo.depositHistory()
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
-  # response = bitvavo.withdrawalHistory({})
+  # response = bitvavo.withdrawalHistory()
   # for item in response:
   #   print(json.dumps(item, indent=2))
 
-# Normally you would define a seperate callback for every function.
+# Normally you would define a separate callback for every function.
 def callback(response):
   print("Callback:", json.dumps(response, indent=2))
 

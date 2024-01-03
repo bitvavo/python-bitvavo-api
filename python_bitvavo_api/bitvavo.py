@@ -1,4 +1,3 @@
-from threading import Timer
 import requests
 import time
 import hmac
@@ -6,9 +5,6 @@ import hashlib
 import json
 import websocket
 import threading
-import os
-import signal
-import sys
 import datetime
 
 debugging = False
@@ -28,6 +24,7 @@ def createSignature(timestamp, method, url, body, APISECRET):
   return signature
 
 def createPostfix(options):
+  options = _default(options, {})
   params = []
   for key in options:
     params.append(key + '=' + str(options[key]))
@@ -35,6 +32,12 @@ def createPostfix(options):
   if(len(options) > 0):
     postfix = '?' + postfix
   return postfix
+
+def _default(value, fallback):
+  return value if value is not None else fallback
+
+def _epoch_millis(dt):
+  return int(dt.timestamp() * 1000)
 
 def asksCompare(a, b):
   if(a < b):
@@ -231,43 +234,50 @@ class Bitvavo:
     return self.publicRequest((self.base + '/time'))
 
   # options: market
-  def markets(self, options):
+  def markets(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/markets' + postfix))
 
   # options: symbol
-  def assets(self, options):
+  def assets(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/assets' + postfix))
 
   # options: depth
-  def book(self, symbol, options):
+  def book(self, symbol, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/book' + postfix))
 
   # options: limit, start, end, tradeIdFrom, tradeIdTo
-  def publicTrades(self, symbol, options):
+  def publicTrades(self, symbol, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/trades' + postfix))
 
   # options: limit, start, end
-  def candles(self, symbol, interval, options):
+  def candles(self, symbol, interval, options=None, limit=None, start=None, end=None):
+    options = _default(options, {})
     options['interval'] = interval
+    if limit is not None:
+      options['limit'] = limit
+    if start is not None:
+      options['start'] = _epoch_millis(start)
+    if end is not None:
+      options['end'] = _epoch_millis(end)
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/' + symbol + '/candles' + postfix))
 
   # options: market
-  def tickerPrice(self, options):
+  def tickerPrice(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/price' + postfix))
 
   # options: market
-  def tickerBook(self, options):
+  def tickerBook(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/book' + postfix))
 
   # options: market
-  def ticker24h(self, options):
+  def ticker24h(self, options=None):
     postfix = createPostfix(options)
     return self.publicRequest((self.base + '/ticker/24h' + postfix))
 
@@ -298,23 +308,25 @@ class Bitvavo:
     return self.privateRequest('/order', postfix, {}, 'DELETE')
 
   # options: limit, start, end, orderIdFrom, orderIdTo
-  def getOrders(self, market, options):
+  def getOrders(self, market, options=None):
+    options = _default(options, {})
     options['market'] = market
     postfix = createPostfix(options)
     return self.privateRequest('/orders', postfix, {}, 'GET')
 
   # options: market
-  def cancelOrders(self, options):
+  def cancelOrders(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/orders', postfix, {}, 'DELETE')
 
   # options: market
-  def ordersOpen(self, options):
+  def ordersOpen(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/ordersOpen', postfix, {}, 'GET')
 
   # options: limit, start, end, tradeIdFrom, tradeIdTo
-  def trades(self, market, options):
+  def trades(self, market, options=None):
+    options = _default(options, {})
     options['market'] = market
     postfix = createPostfix(options)
     return self.privateRequest('/trades', postfix, {}, 'GET')
@@ -323,7 +335,7 @@ class Bitvavo:
     return self.privateRequest('/account', '', {}, 'GET')
 
   # options: symbol
-  def balance(self, options):
+  def balance(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/balance', postfix, {}, 'GET')
 
@@ -339,12 +351,12 @@ class Bitvavo:
     return self.privateRequest('/withdrawal', '', body, 'POST')
 
   # options: symbol, limit, start, end
-  def depositHistory(self, options):
+  def depositHistory(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/depositHistory', postfix, {}, 'GET')
 
   # options: symbol, limit, start, end
-  def withdrawalHistory(self, options):
+  def withdrawalHistory(self, options=None):
     postfix = createPostfix(options)
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 
@@ -371,9 +383,9 @@ class Bitvavo:
       ws = websocket.WebSocketApp(self.wsUrl, 
                                 on_message = self.on_message,
                                 on_error = self.on_error,
-                                on_close = self.on_close)
+                                on_close = self.on_close,
+                                on_open = self.on_open)
       self.ws = ws
-      ws.on_open = self.on_open
 
       self.receiveThread = receiveThread(ws, self)
       self.receiveThread.daemon = True
@@ -396,27 +408,27 @@ class Bitvavo:
         self.waitForSocket(ws, message, private)
 
     def doSend(self, ws, message, private = False):
-      if(private and self.APIKEY == ''):
+      if private and self.APIKEY == '':
         errorToConsole('You did not set the API key, but requested a private function.')
         return
       self.waitForSocket(ws, message, private)
       ws.send(message)
       debugToConsole('SENT: ' + message)
 
-    def on_message(ws, msg):
+    def on_message(self, ws, msg):
       debugToConsole('RECEIVED: ' + msg)
       msg = json.loads(msg)
-      callbacks = ws.callbacks
+      callbacks = self.callbacks
 
-      if('error' in msg):
-        if (msg['errorCode'] == 105):
+      if 'error' in msg:
+        if msg['errorCode'] == 105:
           ws.bitvavo.updateRateLimit(msg)
-        if('error' in callbacks):
+        if 'error' in callbacks:
           callbacks['error'](msg)
         else:
           errorToConsole(json.dumps(msg, indent=2))
 
-      if('action' in msg):
+      if 'action' in msg:
         if(msg['action'] == 'getTime'):
           callbacks['time'](msg['response'])
         elif(msg['action'] == 'getMarkets'):
@@ -501,13 +513,13 @@ class Bitvavo:
           if('subscriptionTrades' in callbacks):
             callbacks['subscriptionTrades'][market](msg)
 
-    def on_error(ws, error):
-      if('error' in callbacks):
-        ws.callbacks['error'](error)
+    def on_error(self, ws, error):
+      if 'error' in self.callbacks:
+        self.callbacks['error'](error)
       else:
         errorToConsole(error)
 
-    def on_close(self):
+    def on_close(self, ws):
       self.receiveThread.exit()
       debugToConsole('Closed Websocket.')
 
@@ -535,11 +547,11 @@ class Bitvavo:
         for market in self.callbacks['subscriptionBookUser']:
           self.subscriptionBook(market, self.callbacks['subscriptionBookUser'][market])
 
-    def on_open(self):
+    def on_open(self, ws):
       now = int(time.time()*1000)
       self.open = True
       self.reconnectTimer = 0.5
-      if(self.APIKEY != ''):
+      if self.APIKEY != '':
         self.doSend(self.ws, json.dumps({ 'window':str(self.ACCESSWINDOW), 'action': 'authenticate', 'key': self.APIKEY, 'signature': createSignature(now, 'GET', '/websocket', {}, self.APISECRET), 'timestamp': now }))
       if self.reconnect:
         debugToConsole("we started reconnecting " + str(self.checkReconnect))

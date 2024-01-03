@@ -172,6 +172,7 @@ Websocket methods do not return your returning weight points, you track your rem
 limit = bitvavo.getRemainingLimit()
 ```
 
+
 If you make more requests than permitted by the weight limit, your IP or API key is banned. 
 
 The rate weighting for each endpoint is supplied in the [Bitvavo API documentation](https://docs.bitvavo.com/).

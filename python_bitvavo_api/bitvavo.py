@@ -18,7 +18,7 @@ def errorToConsole(message):
 
 def createSignature(timestamp, method, url, body, APISECRET):
   string = str(timestamp) + method + '/v2' + url
-  if(len(body.keys()) != 0):
+  if body is not None and len(body.keys()) > 0:
     string += json.dumps(body, separators=(',',':'))
   signature = hmac.new(APISECRET.encode('utf-8'), string.encode('utf-8'), hashlib.sha256).hexdigest()
   return signature
@@ -140,6 +140,7 @@ class Bitvavo:
     self.APISECRET = ''
     self.rateLimitRemaining = 1000
     self.rateLimitReset = 0
+    self.timeout = None
     global debugging
     debugging = False
     for key in options:
@@ -189,7 +190,7 @@ class Bitvavo:
     debugToConsole("REQUEST: " + url)
     if(self.APIKEY != ''):
       now = int(time.time() * 1000)
-      sig = createSignature(now, 'GET', url.replace(self.base, ''), {}, self.APISECRET)
+      sig = createSignature(now, 'GET', url.replace(self.base, ''), None, self.APISECRET)
       headers = {
         'bitvavo-access-key': self.APIKEY,
         'bitvavo-access-signature': sig,
@@ -205,7 +206,7 @@ class Bitvavo:
       self.updateRateLimit(r.headers)
     return r.json()
 
-  def privateRequest(self, endpoint, postfix, body = {}, method = 'GET'):
+  def privateRequest(self, endpoint, postfix, body = None, method = 'GET'):
     now = int(time.time() * 1000)
     sig = createSignature(now, method, (endpoint + postfix), body, self.APISECRET)
     url = self.base + endpoint + postfix
@@ -216,15 +217,8 @@ class Bitvavo:
       'bitvavo-access-window': str(self.ACCESSWINDOW),
     }
     debugToConsole("REQUEST: " + url)
-    if(method == 'GET'):
-      r = requests.get(url, headers = headers, timeout = self.timeout)
-    elif(method == 'DELETE'):
-      r = requests.delete(url, headers = headers, timeout = self.timeout)
-    elif(method == 'POST'):
-      r = requests.post(url, headers = headers, json = body, timeout = self.timeout)
-    elif(method == 'PUT'):
-      r = requests.put(url, headers = headers, json = body, timeout = self.timeout)
-    if('error' in r.json()):
+    r = requests.request(method, url, headers=headers, json=body, timeout=self.timeout)
+    if 'error' in r.json():
       self.updateRateLimit(r.json())
     else:
       self.updateRateLimit(r.headers)

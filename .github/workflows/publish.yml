@@ -1,0 +1,23 @@
+name: Publish
+
+on:
+  release:
+    types:
+      - published
+
+env:
+  python_version: '3.x'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.python_version }}
+      - uses: ./.github/actions/python-build-publish
+        with:
+          repository: pypi
+          token: ${{ secrets.pypi_token }}

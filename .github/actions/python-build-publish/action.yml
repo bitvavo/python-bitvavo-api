@@ -1,0 +1,24 @@
+name: 'Build and Publish Python Package'
+description: 'Builds a Python package and uploads it to PyPI.'
+
+inputs:
+  repository:
+    description: 'The repository to upload the package to.'
+    required: true
+  token:
+    description: 'The token to authenticate with PyPI.'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Build and publish test package
+      shell: bash
+      env:
+        TWINE_REPOSITORY: ${{ inputs.repository }}
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ inputs.token }}
+      run: |
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*

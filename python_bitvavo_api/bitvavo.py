@@ -416,7 +416,7 @@ class Bitvavo:
 
       if 'error' in msg:
         if msg['errorCode'] == 105:
-          ws.bitvavo.updateRateLimit(msg)
+          self.bitvavo.updateRateLimit(msg)
         if 'error' in callbacks:
           callbacks['error'](msg)
         else:
@@ -471,13 +471,14 @@ class Bitvavo:
           market = msg['response']['market']
           if('book' in callbacks):
             callbacks['book'](msg['response'])
-          if(ws.keepBookCopy):
+          if(self.keepBookCopy):
             if(market in callbacks['subscriptionBook']):
               callbacks['subscriptionBook'][market](ws, msg)
 
       elif('event' in msg):
         if(msg['event'] == 'authenticate'):
-          ws.authenticated = True
+          self.authenticated = True
+          debugToConsole('Authenticated Websocket.')
         elif(msg['event'] == 'fill'):
           market = msg['market']
           callbacks['subscriptionAccount'][market](msg)
@@ -499,7 +500,7 @@ class Bitvavo:
           if('subscriptionBookUpdate' in callbacks):
             if(market in callbacks['subscriptionBookUpdate']):
               callbacks['subscriptionBookUpdate'][market](msg)
-          if(ws.keepBookCopy):
+          if(self.keepBookCopy):
             if(market in callbacks['subscriptionBook']):
               callbacks['subscriptionBook'][market](ws, msg)
         elif(msg['event'] == 'trade'):

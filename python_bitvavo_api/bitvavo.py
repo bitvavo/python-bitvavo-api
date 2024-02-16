@@ -328,6 +328,13 @@ class Bitvavo:
   def account(self):
     return self.privateRequest('/account', '', {}, 'GET')
 
+  def fees(self, market=None):
+    options = {}
+    if market is not None:
+        options['market'] = market
+    postfix = createPostfix(options)
+    return self.privateRequest('/account/fees', postfix, {}, 'GET')
+
   # options: symbol
   def balance(self, options=None):
     postfix = createPostfix(options)
@@ -455,6 +462,8 @@ class Bitvavo:
           callbacks['trades'](msg['response'])
         elif(msg['action'] == 'privateGetAccount'):
           callbacks['account'](msg['response'])
+        elif(msg['action'] == 'privateGetFees'):
+          callbacks['fees'](msg['response'])
         elif(msg['action'] == 'privateGetBalance'):
           callbacks['balance'](msg['response'])
         elif(msg['action'] == 'privateDepositAssets'):
@@ -673,6 +682,13 @@ class Bitvavo:
     def account(self, callback):
       self.callbacks['account'] = callback
       self.doSend(self.ws, json.dumps({ 'action': 'privateGetAccount' }), True)
+
+    def fees(self, market, callback=None):
+      if callable(market):
+        callback = market
+        market = None
+      self.callbacks['fees'] = callback
+      self.doSend(self.ws, json.dumps({ 'action': 'privateGetFees', 'market': market }), True)
 
     # options: symbol
     def balance(self, options, callback):

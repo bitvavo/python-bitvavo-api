@@ -150,6 +150,8 @@ def testWebsockets(bitvavo):
   # websocket.trades('BTC-EUR', {}, callback)
 
   # websocket.account(callback)
+  # websocket.fees(callback)
+  # websocket.fees("BTC-EUR", callback)
   # websocket.balance({}, callback)
   # websocket.depositAssets('BTC', callback)
   # websocket.withdrawAssets('BTC', '1', 'BitcoinAddress', {}, callback)

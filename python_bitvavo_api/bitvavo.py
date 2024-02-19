@@ -328,6 +328,13 @@ class Bitvavo:
   def account(self):
     return self.privateRequest('/account', '', {}, 'GET')
 
+  def fees(self, market=None):
+    options = {}
+    if market is not None:
+        options['market'] = market
+    postfix = createPostfix(options)
+    return self.privateRequest('/account/fees', postfix, {}, 'GET')
+
   # options: symbol
   def balance(self, options=None):
     postfix = createPostfix(options)
@@ -416,7 +423,7 @@ class Bitvavo:
 
       if 'error' in msg:
         if msg['errorCode'] == 105:
-          ws.bitvavo.updateRateLimit(msg)
+          self.bitvavo.updateRateLimit(msg)
         if 'error' in callbacks:
           callbacks['error'](msg)
         else:
@@ -455,6 +462,8 @@ class Bitvavo:
           callbacks['trades'](msg['response'])
         elif(msg['action'] == 'privateGetAccount'):
           callbacks['account'](msg['response'])
+        elif(msg['action'] == 'privateGetFees'):
+          callbacks['fees'](msg['response'])
         elif(msg['action'] == 'privateGetBalance'):
           callbacks['balance'](msg['response'])
         elif(msg['action'] == 'privateDepositAssets'):
@@ -471,13 +480,14 @@ class Bitvavo:
           market = msg['response']['market']
           if('book' in callbacks):
             callbacks['book'](msg['response'])
-          if(ws.keepBookCopy):
+          if(self.keepBookCopy):
             if(market in callbacks['subscriptionBook']):
               callbacks['subscriptionBook'][market](ws, msg)
 
       elif('event' in msg):
         if(msg['event'] == 'authenticate'):
-          ws.authenticated = True
+          self.authenticated = True
+          debugToConsole('Authenticated Websocket.')
         elif(msg['event'] == 'fill'):
           market = msg['market']
           callbacks['subscriptionAccount'][market](msg)
@@ -499,7 +509,7 @@ class Bitvavo:
           if('subscriptionBookUpdate' in callbacks):
             if(market in callbacks['subscriptionBookUpdate']):
               callbacks['subscriptionBookUpdate'][market](msg)
-          if(ws.keepBookCopy):
+          if(self.keepBookCopy):
             if(market in callbacks['subscriptionBook']):
               callbacks['subscriptionBook'][market](ws, msg)
         elif(msg['event'] == 'trade'):
@@ -672,6 +682,13 @@ class Bitvavo:
     def account(self, callback):
       self.callbacks['account'] = callback
       self.doSend(self.ws, json.dumps({ 'action': 'privateGetAccount' }), True)
+
+    def fees(self, market, callback=None):
+      if callable(market):
+        callback = market
+        market = None
+      self.callbacks['fees'] = callback
+      self.doSend(self.ws, json.dumps({ 'action': 'privateGetFees', 'market': market }), True)
 
     # options: symbol
     def balance(self, options, callback):

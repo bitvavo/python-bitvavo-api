@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'websocket-client',
-        'requests==2.31.0',
+        'requests==2.32.0',
         'setuptools'
     ],
     classifiers=[

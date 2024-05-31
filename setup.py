@@ -16,8 +16,8 @@ setup(
     url="https://github.com/bitvavo/python-bitvavo-api",
     packages=find_packages(),
     install_requires=[
-        'websocket-client',
-        'requests==2.31.0',
+        'websocket-client>=1.6.0,<2.0.0',
+        'requests>=2.31.0,<3.0.0',
         'setuptools'
     ],
     classifiers=[

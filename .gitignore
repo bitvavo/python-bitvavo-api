@@ -1,4 +1,11 @@
-.DS_Store
+### Python ###
 dist
-python_bitvavo_api.egg-info
+*.egg-info
+*.whl
+
+### Mac OS ###
+.DS_Store
+
+### IDEs ###
 .idea
+.vscode

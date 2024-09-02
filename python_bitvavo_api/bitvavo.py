@@ -724,8 +724,14 @@ class Bitvavo:
     def subscriptionTicker(self, market, callback):
       if 'subscriptionTicker' not in self.callbacks:
         self.callbacks['subscriptionTicker'] = {}
-      self.callbacks['subscriptionTicker'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker', 'markets': [market] }] }))
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionTicker'][i_market] = callback
+          markets = market
+      else:
+        self.callbacks['subscriptionTicker'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker', 'markets': markets }] }))
 
     def subscriptionTicker24h(self, market, callback):
       if 'subscriptionTicker24h' not in self.callbacks:

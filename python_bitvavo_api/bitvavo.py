@@ -588,7 +588,7 @@ class Bitvavo:
         errorToConsole(error)
 
     def on_close(self, ws, close_status_code, close_msg):
-      self.receiveThread.exit()
+      # self.receiveThread.exit()
       debugToConsole(f'Closed Websocket (Status: {close_status_code} Message: {close_msg}).')
 
     def checkReconnect(self):

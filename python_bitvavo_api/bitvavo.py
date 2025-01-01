@@ -812,22 +812,39 @@ class Bitvavo:
     def subscriptionAccount(self, market, callback):
       if 'subscriptionAccount' not in self.callbacks:
         self.callbacks['subscriptionAccount'] = {}
-      self.callbacks['subscriptionAccount'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'account', 'markets': [market] }] }), True)
 
-    def subscriptionCandles(self, market, interval, callback):
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionAccount'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionAccount'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'account', 'markets': markets }] }), True)
+
+    def subscriptionCandles(self, markets, interval, callback):
       if 'subscriptionCandles' not in self.callbacks:
         self.callbacks['subscriptionCandles'] = {}
-      if market not in self.callbacks['subscriptionCandles']:
-        self.callbacks['subscriptionCandles'][market] = {}
-      self.callbacks['subscriptionCandles'][market][interval] = callback
+
+      if not isinstance(markets, list):
+        markets = [markets]
+      for market in markets:
+        if market not in self.callbacks['subscriptionCandles']:
+          self.callbacks['subscriptionCandles'][market] = {}
+        self.callbacks['subscriptionCandles'][market][interval] = callback
       self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'candles', 'interval': [interval], 'markets': [market] }] }))
 
     def subscriptionTrades(self, market, callback):
       if 'subscriptionTrades' not in self.callbacks:
         self.callbacks['subscriptionTrades'] = {}
-      self.callbacks['subscriptionTrades'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'trades', 'markets': [market] }] }))
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionTrades'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionTrades'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'trades', 'markets': markets }] }))
 
     def subscriptionBookUpdate(self, market, callback):
       if 'subscriptionBookUpdate' not in self.callbacks:

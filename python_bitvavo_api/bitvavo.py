@@ -336,8 +336,15 @@ class Bitvavo:
     body['orderType'] = orderType
     return self.privateRequest('/order', '', body, 'POST')
 
-  def getOrder(self, market, orderId):
-    postfix = createPostfix({ 'market': market, 'orderId': orderId })
+  def getOrder(self, market, orderId: str = '', clientOrderId: str = ''):
+    body = {
+      'market': market
+    }
+    if clientOrderId != '':
+      body['clientOrderId'] = clientOrderId
+    else:
+      body['orderId'] = orderId
+    postfix = createPostfix(body)
     return self.privateRequest('/order', postfix, {}, 'GET')
 
   # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)

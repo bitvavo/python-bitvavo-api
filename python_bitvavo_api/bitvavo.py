@@ -121,7 +121,10 @@ class receiveThread (threading.Thread):
   def run(self):
     try:
       while(self.wsObject.keepAlive):
-        self.ws.run_forever()
+        self.ws.run_forever(
+          ping_interval = self.wsObject.bitvavo.ping_interval,
+          ping_timeout  = self.wsObject.bitvavo.ping_timeout
+        )
         self.wsObject.reconnect = True
         self.wsObject.authenticated = False
         time.sleep(self.wsObject.reconnectTimer)
@@ -141,6 +144,8 @@ class Bitvavo:
     self.rateLimitRemaining = 1000
     self.rateLimitReset = 0
     self.timeout = None
+    self.ping_interval = None
+    self.ping_timeout = None
     global debugging
     debugging = False
     for key in options:
@@ -157,11 +162,17 @@ class Bitvavo:
       elif key.lower() == "wsurl":
         self.wsUrl = options[key]
       elif key.lower() == "timeout":
-        self.timeout = options[key]        
+        self.timeout = options[key]
+      elif key.lower() == "ping_interval":
+        self.ping_interval = options[key]
+      elif key.lower() == "ping_timeout":
+        self.ping_timeout = options[key]
     if(self.ACCESSWINDOW == None):
       self.ACCESSWINDOW = 10000
 
   def getRemainingLimit(self):
+    if self.rateLimitRemaining < 999 and round(time.time()) % 60 == 0:
+      self.time()
     return self.rateLimitRemaining
 
   def updateRateLimit(self, response):
@@ -173,18 +184,58 @@ class Bitvavo:
         if(not hasattr(self, 'rateLimitThread')):
           self.rateLimitThread = rateLimitThread(timeToWait, self)
           self.rateLimitThread.daemon = True
+          self.rateLimitThread.name = 'Bitvavo.rateLimitThread'
           self.rateLimitThread.start()
       # setTimeout(checkLimit, timeToWait)
-    if ('bitvavo-ratelimit-remaining' in response):
+    elif ('bitvavo-ratelimit-remaining' in response):
       self.rateLimitRemaining = int(response['bitvavo-ratelimit-remaining'])
-    if ('bitvavo-ratelimit-resetat' in response):
+    elif ('bitvavo-ratelimit-resetat' in response):
       self.rateLimitReset = int(response['bitvavo-ratelimit-resetat'])
       timeToWait = (self.rateLimitReset / 1000) - time.time()
       if(not hasattr(self, 'rateLimitThread')):
           self.rateLimitThread = rateLimitThread(timeToWait, self)
           self.rateLimitThread.daemon = True
+          self.rateLimitThread.name = 'Bitvavo.rateLimitThread'
           self.rateLimitThread.start()
 
+  def updateRateLimitFromWebsocket(self, request):
+    endpointWeightPoints = {
+      'authenticate': 0, # Free
+      'getAssets': 1,
+      'getBook': 1,
+      'getCandles': 1,
+      'getMarkets': 1,
+      'getTicker24h': [1, 25], # 1 with 'market', 25 without 'market' specified
+      'getTickerBook': 1,
+      'getTickerPrice': 1,
+      'getTime': 1,
+      'getTrades': 5,
+      'privateCancelOrder': 0, # Free, can still be used even if limit reached
+      'privateCancelOrders': 0, # Free, can still be used even if limit reached
+      'privateCreateOrder': 1,
+      'privateDepositAssets': 1,
+      'privateGetAccount': 1,
+      'privateGetBalance': 5,
+      'privateGetDepositHistory': 5,
+      'privateGetFees': 1,
+      'privateGetOrder': 1,
+      'privateGetOrders': 5,
+      'privateGetOrdersOpen': [1, 25], # 1 with 'market', 25 without 'market' specified
+      'privateGetTrades': 5,
+      'privateGetTransactionHistory': 1,
+      'privateGetWithdrawalHistory': 5,
+      'privateUpdateOrder': 1,
+      'privateWithdrawAssets': 1,
+      'subscribe': 1
+    }
+    action = request['action']
+    weightPoints = endpointWeightPoints[action]
+    if type(weightPoints) is list and hasattr(request, 'market'):
+      weightPoints = weightPoints[1]
+    elif type(weightPoints) is list:
+      weightPoints = weightPoints[0]
+
+    self.rateLimitRemaining = self.rateLimitRemaining - weightPoints
 
   def publicRequest(self, url):
     debugToConsole("REQUEST: " + url)
@@ -285,8 +336,15 @@ class Bitvavo:
     body['orderType'] = orderType
     return self.privateRequest('/order', '', body, 'POST')
 
-  def getOrder(self, market, orderId):
-    postfix = createPostfix({ 'market': market, 'orderId': orderId })
+  def getOrder(self, market, orderId: str = '', clientOrderId: str = ''):
+    body = {
+      'market': market
+    }
+    if clientOrderId != '':
+      body['clientOrderId'] = clientOrderId
+    else:
+      body['orderId'] = orderId
+    postfix = createPostfix(body)
     return self.privateRequest('/order', postfix, {}, 'GET')
 
   # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
@@ -361,6 +419,10 @@ class Bitvavo:
     postfix = createPostfix(options)
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 
+  def accountTransactionHistory(self, options=None):
+    postfix = createPostfix(options)
+    return self.privateRequest('/account/history', postfix, {}, 'GET')
+
   def newWebsocket(self):
     return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW, self.wsUrl, self)
 
@@ -390,6 +452,7 @@ class Bitvavo:
 
       self.receiveThread = receiveThread(ws, self)
       self.receiveThread.daemon = True
+      self.receiveThread.name = 'Bitvavo.websocket.receiveThread'
       self.receiveThread.start()
 
       self.authenticated = False
@@ -414,6 +477,7 @@ class Bitvavo:
         return
       self.waitForSocket(ws, message, private)
       ws.send(message)
+      self.bitvavo.updateRateLimitFromWebsocket(json.loads(message))
       debugToConsole('SENT: ' + message)
 
     def on_message(self, ws, msg):
@@ -523,9 +587,9 @@ class Bitvavo:
       else:
         errorToConsole(error)
 
-    def on_close(self, ws):
-      self.receiveThread.exit()
-      debugToConsole('Closed Websocket.')
+    def on_close(self, ws, close_status_code, close_msg):
+      # self.receiveThread.exit()
+      debugToConsole(f'Closed Websocket (Status: {close_status_code} Message: {close_msg}).')
 
     def checkReconnect(self):
       if('subscriptionTicker' in self.callbacks):
@@ -724,34 +788,63 @@ class Bitvavo:
     def subscriptionTicker(self, market, callback):
       if 'subscriptionTicker' not in self.callbacks:
         self.callbacks['subscriptionTicker'] = {}
-      self.callbacks['subscriptionTicker'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker', 'markets': [market] }] }))
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionTicker'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionTicker'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker', 'markets': markets }] }))
 
     def subscriptionTicker24h(self, market, callback):
       if 'subscriptionTicker24h' not in self.callbacks:
         self.callbacks['subscriptionTicker24h'] = {}
-      self.callbacks['subscriptionTicker24h'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker24h', 'markets': [market] }] }))
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionTicker24h'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionTicker24h'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'ticker24h', 'markets': markets }] }))
 
     def subscriptionAccount(self, market, callback):
       if 'subscriptionAccount' not in self.callbacks:
         self.callbacks['subscriptionAccount'] = {}
-      self.callbacks['subscriptionAccount'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'account', 'markets': [market] }] }), True)
 
-    def subscriptionCandles(self, market, interval, callback):
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionAccount'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionAccount'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'account', 'markets': markets }] }), True)
+
+    def subscriptionCandles(self, markets, interval, callback):
       if 'subscriptionCandles' not in self.callbacks:
         self.callbacks['subscriptionCandles'] = {}
-      if market not in self.callbacks['subscriptionCandles']:
-        self.callbacks['subscriptionCandles'][market] = {}
-      self.callbacks['subscriptionCandles'][market][interval] = callback
+
+      if not isinstance(markets, list):
+        markets = [markets]
+      for market in markets:
+        if market not in self.callbacks['subscriptionCandles']:
+          self.callbacks['subscriptionCandles'][market] = {}
+        self.callbacks['subscriptionCandles'][market][interval] = callback
       self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'candles', 'interval': [interval], 'markets': [market] }] }))
 
     def subscriptionTrades(self, market, callback):
       if 'subscriptionTrades' not in self.callbacks:
         self.callbacks['subscriptionTrades'] = {}
-      self.callbacks['subscriptionTrades'][market] = callback
-      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'trades', 'markets': [market] }] }))
+      if type(market) is list:
+        for i_market in market:
+          self.callbacks['subscriptionTrades'][i_market] = callback
+        markets = market
+      else:
+        self.callbacks['subscriptionTrades'][market] = callback
+        markets = [market]
+      self.doSend(self.ws, json.dumps({ 'action': 'subscribe', 'channels': [{ 'name': 'trades', 'markets': markets }] }))
 
     def subscriptionBookUpdate(self, market, callback):
       if 'subscriptionBookUpdate' not in self.callbacks:

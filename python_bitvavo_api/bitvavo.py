@@ -171,6 +171,8 @@ class Bitvavo:
       self.ACCESSWINDOW = 10000
 
   def getRemainingLimit(self):
+    if self.rateLimitRemaining < 999 and round(time.time()) % 60 == 0:
+      self.time()
     return self.rateLimitRemaining
 
   def updateRateLimit(self, response):
@@ -182,18 +184,58 @@ class Bitvavo:
         if(not hasattr(self, 'rateLimitThread')):
           self.rateLimitThread = rateLimitThread(timeToWait, self)
           self.rateLimitThread.daemon = True
+          self.rateLimitThread.name = 'Bitvavo.rateLimitThread'
           self.rateLimitThread.start()
       # setTimeout(checkLimit, timeToWait)
-    if ('bitvavo-ratelimit-remaining' in response):
+    elif ('bitvavo-ratelimit-remaining' in response):
       self.rateLimitRemaining = int(response['bitvavo-ratelimit-remaining'])
-    if ('bitvavo-ratelimit-resetat' in response):
+    elif ('bitvavo-ratelimit-resetat' in response):
       self.rateLimitReset = int(response['bitvavo-ratelimit-resetat'])
       timeToWait = (self.rateLimitReset / 1000) - time.time()
       if(not hasattr(self, 'rateLimitThread')):
           self.rateLimitThread = rateLimitThread(timeToWait, self)
           self.rateLimitThread.daemon = True
+          self.rateLimitThread.name = 'Bitvavo.rateLimitThread'
           self.rateLimitThread.start()
 
+  def updateRateLimitFromWebsocket(self, request):
+    endpointWeightPoints = {
+      'authenticate': 0, # Free
+      'getAssets': 1,
+      'getBook': 1,
+      'getCandles': 1,
+      'getMarkets': 1,
+      'getTicker24h': [1, 25], # 1 with 'market', 25 without 'market' specified
+      'getTickerBook': 1,
+      'getTickerPrice': 1,
+      'getTime': 1,
+      'getTrades': 5,
+      'privateCancelOrder': 0, # Free, can still be used even if limit reached
+      'privateCancelOrders': 0, # Free, can still be used even if limit reached
+      'privateCreateOrder': 1,
+      'privateDepositAssets': 1,
+      'privateGetAccount': 1,
+      'privateGetBalance': 5,
+      'privateGetDepositHistory': 5,
+      'privateGetFees': 1,
+      'privateGetOrder': 1,
+      'privateGetOrders': 5,
+      'privateGetOrdersOpen': [1, 25], # 1 with 'market', 25 without 'market' specified
+      'privateGetTrades': 5,
+      'privateGetTransactionHistory': 1,
+      'privateGetWithdrawalHistory': 5,
+      'privateUpdateOrder': 1,
+      'privateWithdrawAssets': 1,
+      'subscribe': 1
+    }
+    action = request['action']
+    weightPoints = endpointWeightPoints[action]
+    if type(weightPoints) is list and hasattr(request, 'market'):
+      weightPoints = weightPoints[1]
+    elif type(weightPoints) is list:
+      weightPoints = weightPoints[0]
+
+    self.rateLimitRemaining = self.rateLimitRemaining - weightPoints
 
   def publicRequest(self, url):
     debugToConsole("REQUEST: " + url)
@@ -423,6 +465,7 @@ class Bitvavo:
         return
       self.waitForSocket(ws, message, private)
       ws.send(message)
+      self.bitvavo.updateRateLimitFromWebsocket(json.loads(message))
       debugToConsole('SENT: ' + message)
 
     def on_message(self, ws, msg):

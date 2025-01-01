@@ -452,6 +452,7 @@ class Bitvavo:
 
       self.receiveThread = receiveThread(ws, self)
       self.receiveThread.daemon = True
+      self.receiveThread.name = 'Bitvavo.websocket.receiveThread'
       self.receiveThread.start()
 
       self.authenticated = False
@@ -586,9 +587,9 @@ class Bitvavo:
       else:
         errorToConsole(error)
 
-    def on_close(self, ws):
+    def on_close(self, ws, close_status_code, close_msg):
       self.receiveThread.exit()
-      debugToConsole('Closed Websocket.')
+      debugToConsole(f'Closed Websocket (Status: {close_status_code} Message: {close_msg}).')
 
     def checkReconnect(self):
       if('subscriptionTicker' in self.callbacks):

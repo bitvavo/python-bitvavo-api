@@ -121,7 +121,10 @@ class receiveThread (threading.Thread):
   def run(self):
     try:
       while(self.wsObject.keepAlive):
-        self.ws.run_forever()
+        self.ws.run_forever(
+          ping_interval = self.wsObject.bitvavo.ping_interval,
+          ping_timeout  = self.wsObject.bitvavo.ping_timeout
+        )
         self.wsObject.reconnect = True
         self.wsObject.authenticated = False
         time.sleep(self.wsObject.reconnectTimer)
@@ -141,6 +144,8 @@ class Bitvavo:
     self.rateLimitRemaining = 1000
     self.rateLimitReset = 0
     self.timeout = None
+    self.ping_interval = None
+    self.ping_timeout = None
     global debugging
     debugging = False
     for key in options:
@@ -157,7 +162,11 @@ class Bitvavo:
       elif key.lower() == "wsurl":
         self.wsUrl = options[key]
       elif key.lower() == "timeout":
-        self.timeout = options[key]        
+        self.timeout = options[key]
+      elif key.lower() == "ping_interval":
+        self.ping_interval = options[key]
+      elif key.lower() == "ping_timeout":
+        self.ping_timeout = options[key]
     if(self.ACCESSWINDOW == None):
       self.ACCESSWINDOW = 10000
 

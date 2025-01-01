@@ -419,6 +419,10 @@ class Bitvavo:
     postfix = createPostfix(options)
     return self.privateRequest('/withdrawalHistory', postfix, {}, 'GET')
 
+  def accountTransactionHistory(self, options=None):
+    postfix = createPostfix(options)
+    return self.privateRequest('/account/history', postfix, {}, 'GET')
+
   def newWebsocket(self):
     return Bitvavo.websocket(self.APIKEY, self.APISECRET, self.ACCESSWINDOW, self.wsUrl, self)
 

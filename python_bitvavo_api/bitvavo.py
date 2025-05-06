@@ -278,7 +278,7 @@ class Bitvavo:
   # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection)
   #                           stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
   #                           stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
-  #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired
+  #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired, operatorId
   def placeOrder(self, market, side, orderType, body):
     body['market'] = market
     body['side'] = side
@@ -292,13 +292,17 @@ class Bitvavo:
   # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
   #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
   #                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+  #          all orderTypes: operatorId
   def updateOrder(self, market, orderId, body):
     body['market'] = market
     body['orderId'] = orderId
     return self.privateRequest('/order', '', body, 'PUT')
 
-  def cancelOrder(self, market, orderId):
-    postfix = createPostfix({ 'market': market, 'orderId': orderId})
+  def cancelOrder(self, market, orderId, operatorId=None):
+    params = {'market': market, 'orderId': orderId}
+    if operatorId is not None:
+      params['operatorId'] = operatorId
+    postfix = createPostfix(params)
     return self.privateRequest('/order', postfix, {}, 'DELETE')
 
   # options: limit, start, end, orderIdFrom, orderIdTo
@@ -624,7 +628,7 @@ class Bitvavo:
     # optional body parameters: limit:(amount, price, postOnly), market:(amount, amountQuote, disableMarketProtection)
     #                           stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
     #                           stopLossLimit/takeProfitLimit:(amount, price, postOnly, triggerType, triggerReference, triggerAmount)
-    #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired
+    #                           all orderTypes: timeInForce, selfTradePrevention, responseRequired, operatorId
     def placeOrder(self, market, side, orderType, body, callback):
       self.callbacks['placeOrder'] = callback
       body['market'] = market
@@ -641,6 +645,7 @@ class Bitvavo:
     # Optional parameters: limit:(amount, amountRemaining, price, timeInForce, selfTradePrevention, postOnly)
     #          untriggered stopLoss/takeProfit:(amount, amountQuote, disableMarketProtection, triggerType, triggerReference, triggerAmount)
     #                      stopLossLimit/takeProfitLimit: (amount, price, postOnly, triggerType, triggerReference, triggerAmount)
+    #          all orderTypes: operatorId
     def updateOrder(self, market, orderId, body, callback):
       self.callbacks['updateOrder'] = callback
       body['market'] = market
@@ -648,9 +653,11 @@ class Bitvavo:
       body['action'] = 'privateUpdateOrder'
       self.doSend(self.ws, json.dumps(body), True)
 
-    def cancelOrder(self, market, orderId, callback):
+    def cancelOrder(self, market, orderId, callback, operatorId=None):
       self.callbacks['cancelOrder'] = callback
       options = { 'action': 'privateCancelOrder', 'market': market, 'orderId': orderId }
+      if operatorId is not None:
+        options['operatorId'] = operatorId
       self.doSend(self.ws, json.dumps(options), True)
 
     # options: limit, start, end, orderIdFrom, orderIdTo

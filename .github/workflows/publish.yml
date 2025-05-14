@@ -5,11 +5,6 @@ on:
     types:
       - published
 
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Next Version'
-
 env:
   python_version: '3.x'
 

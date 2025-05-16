@@ -99,6 +99,8 @@ class rateLimitThread (threading.Thread):
     threading.Thread.__init__(self)
 
   def waitForReset(self, waitTime):
+    if waitTime < 0.0:
+      waitTime = 0.001  # 1ms
     time.sleep(waitTime)
     if (time.time() < self.bitvavo.rateLimitReset):
       self.bitvavo.rateLimitRemaining = 1000

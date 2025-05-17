@@ -10,7 +10,7 @@ setup(
     name="python_bitvavo_api",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version="v1.4.2a",
+    version="v1.4.3",
     author="Bitvavo/CIBC",
     description="Use Bitvavo SDK for Python to buy, sell, and store over 200 digital assets on Bitvavo from inside your app.",
     url="https://github.com/bitvavo/python-bitvavo-api",

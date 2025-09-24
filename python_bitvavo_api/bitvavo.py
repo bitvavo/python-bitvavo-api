@@ -525,11 +525,10 @@ class Bitvavo:
       if 'error' in self.callbacks:
         self.callbacks['error'](error)
       else:
-        errorToConsole(error)
+        errorToConsole(repr(error))
 
-    def on_close(self, ws):
-      self.receiveThread.exit()
-      debugToConsole('Closed Websocket.')
+    def on_close(self, ws, close_status_code=None, close_msg=None):
+      debugToConsole(f"Closed Websocket. code={close_status_code} reason={close_msg}")
 
     def checkReconnect(self):
       if('subscriptionTicker' in self.callbacks):

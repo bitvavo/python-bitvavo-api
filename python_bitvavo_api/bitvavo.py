@@ -537,7 +537,7 @@ class Bitvavo:
           self.subscriptionTicker(market, self.callbacks['subscriptionTicker'][market])
       if('subscriptionTicker24h' in self.callbacks):
         for market in self.callbacks['subscriptionTicker24h']:
-          self.subscriptionTicker(market, self.callbacks['subscriptionTicker24h'][market])
+          self.subscriptionTicker24h(market, self.callbacks['subscriptionTicker24h'][market])
       if('subscriptionAccount' in self.callbacks):
         for market in self.callbacks['subscriptionAccount']:
           self.subscriptionAccount(market, self.callbacks['subscriptionAccount'][market])

@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest-4core
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           token: ${{ secrets.release_token }}
 
@@ -27,7 +27,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ env.python_version }}
 
@@ -45,7 +45,7 @@ jobs:
       - name: Push release commit
         run: git push --tags origin ${{ github.ref_name }}
 
-      - uses: ncipollo/release-action@v1
+      - uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           tag: v${{ github.event.inputs.version }}
           draft: true
